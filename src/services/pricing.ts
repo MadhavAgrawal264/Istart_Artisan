@@ -11,6 +11,56 @@
 
 import { PricingBreakdown, SaleLikelihoodAssessment, SaleLikelihoodState } from "../types/artisan.ts";
 
+export interface FairPriceInput {
+  materialCost: number;
+  labourCost: number;
+  packagingCost: number;
+  otherExpenses: number;
+  profitMarginPercent: number;
+}
+
+export interface FairPriceSummary {
+  materialCost: number;
+  labourCost: number;
+  packagingCost: number;
+  otherExpenses: number;
+  otherAndPackagingTotal: number;
+  totalProductionCost: number;
+  profitMarginPercent: number;
+  profitAmount: number;
+  suggestedSellingPrice: number;
+}
+
+/**
+ * Computes transparent cost-based craft pricing:
+ * Total Production Cost = Material Cost + Labour Cost + Packaging Cost + Other Expenses
+ * Suggested Selling Price = Total Production Cost * (1 + Profit Margin / 100)
+ */
+export function calculateFairPriceSummary(input: FairPriceInput): FairPriceSummary {
+  const materialCost = Math.max(0, Number(input.materialCost) || 0);
+  const labourCost = Math.max(0, Number(input.labourCost) || 0);
+  const packagingCost = Math.max(0, Number(input.packagingCost) || 0);
+  const otherExpenses = Math.max(0, Number(input.otherExpenses) || 0);
+  const profitMarginPercent = Math.max(0, Math.min(200, Number(input.profitMarginPercent) || 0));
+
+  const otherAndPackagingTotal = Math.round(packagingCost + otherExpenses);
+  const totalProductionCost = Math.round(materialCost + labourCost + otherAndPackagingTotal);
+  const profitAmount = Math.round((totalProductionCost * profitMarginPercent) / 100);
+  const suggestedSellingPrice = Math.round(totalProductionCost * (1 + profitMarginPercent / 100));
+
+  return {
+    materialCost,
+    labourCost,
+    packagingCost,
+    otherExpenses,
+    otherAndPackagingTotal,
+    totalProductionCost,
+    profitMarginPercent,
+    profitAmount,
+    suggestedSellingPrice,
+  };
+}
+
 /**
  * Strict bounds for artisan manual pricing override.
  */

@@ -237,6 +237,79 @@ export class AuthService {
     }
   }
 
+  public async updateAccount(updates: {
+    fullName?: string;
+    mobileNumber?: string;
+    email?: string;
+    languagePreference?: string;
+    notifyEnquiries?: boolean;
+    notifyTips?: boolean;
+  }): Promise<AuthResult> {
+    if (isSupabaseConfigured()) {
+      try {
+        const { data, error } = await supabase.auth.updateUser({
+          data: {
+            ...(updates.fullName !== undefined ? { full_name: updates.fullName } : {}),
+            ...(updates.mobileNumber !== undefined ? { mobile_number: updates.mobileNumber } : {}),
+          },
+        });
+        if (error) return { success: false, user: null, error: error.message };
+        return { success: true, user: data?.user ? mapSupabaseUser(data.user) : null, error: null };
+      } catch (err: any) {
+        return { success: false, user: null, error: err?.message || "Could not update account." };
+      }
+    }
+
+    const token = this.getStoredToken();
+    if (!token) {
+      return { success: false, user: null, error: "Sign in again to update account settings." };
+    }
+    try {
+      const res = await fetch("/api/auth/account", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, user: null, error: data.error || "Could not update account." };
+      }
+      return { success: true, user: data.user, error: null };
+    } catch {
+      return { success: false, user: null, error: "Could not reach account service." };
+    }
+  }
+
+  public async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; error: string | null }> {
+    if (isSupabaseConfigured()) {
+      try {
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        return error ? { success: false, error: error.message } : { success: true, error: null };
+      } catch (err: any) {
+        return { success: false, error: err?.message || "Could not update password." };
+      }
+    }
+
+    const token = this.getStoredToken();
+    if (!token) {
+      return { success: false, error: "Sign in again to change your password." };
+    }
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Could not change password." };
+      }
+      return { success: true, error: null };
+    } catch {
+      return { success: false, error: "Could not reach authentication server." };
+    }
+  }
+
   public async logout(): Promise<void> {
     if (isSupabaseConfigured()) {
       try {
@@ -258,6 +331,10 @@ export class AuthService {
       }
     }
     this.clearStoredToken();
+  }
+
+  public getAccessToken(): string | null {
+    return this.getStoredToken();
   }
 
   private getStoredToken(): string | null {

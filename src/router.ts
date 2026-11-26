@@ -11,6 +11,7 @@ export type RouteName =
   | "home"
   | "explore"
   | "product"
+  | "public-artisan"
   | "about"
   | "contact"
   | "login"
@@ -76,6 +77,10 @@ export function parseCurrentLocation(): ParsedRoute {
   if (path.startsWith("/product/")) {
     const id = decodeURIComponent(path.slice("/product/".length));
     return { name: "product", path, params: { id }, query };
+  }
+  if (path.startsWith("/artisan/") && path !== "/artisan/dashboard") {
+    const id = decodeURIComponent(path.slice("/artisan/".length));
+    return { name: "public-artisan", path, params: { id }, query };
   }
   if (path === "/about") {
     return { name: "about", path, params: {}, query };

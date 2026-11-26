@@ -93,6 +93,27 @@
   font-weight: 700;
 }
 
+@media (min-width: 1024px) {
+  #artisan-dashboard-shell.sidebar-collapsed #artisan-sidebar {
+    width: 5.25rem;
+  }
+  #artisan-dashboard-shell.sidebar-collapsed #artisan-main-column {
+    padding-left: 5.25rem;
+  }
+  #artisan-dashboard-shell.sidebar-collapsed .sidebar-text,
+  #artisan-dashboard-shell.sidebar-collapsed #sidebar-inquiries-badge {
+    display: none;
+  }
+  #artisan-dashboard-shell.sidebar-collapsed .nav-tab-btn,
+  #artisan-dashboard-shell.sidebar-collapsed #artisan-sidebar-brand,
+  #artisan-dashboard-shell.sidebar-collapsed #artisan-sidebar-footer a,
+  #artisan-dashboard-shell.sidebar-collapsed #artisan-sidebar-footer button {
+    justify-content: center;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
 .mobile-nav-btn.is-active {
   color: var(--color-botanical-deep);
   font-weight: 700;

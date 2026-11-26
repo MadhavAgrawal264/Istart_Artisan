@@ -98,8 +98,16 @@ function safeParseJson(raw: string): any {
 
 // Built-in Lightweight Data Store (Pre-seeded with authentic heritage Indian crafts)
 // Operates immediately out-of-the-box with zero external database configuration.
-let inMemoryProducts = [...INITIAL_PRODUCTS];
-let inMemoryArtisans = [...INITIAL_ARTISANS];
+let inMemoryProducts: any[] = INITIAL_PRODUCTS.map((p: any) => ({
+  ...p,
+  status: p.isApprovedByArtisan === false ? "draft" : "published",
+  images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.enhancedImageUrl || p.imageUrl],
+  dimensions: p.dimensions || "Standard",
+}));
+let inMemoryArtisans: any[] = INITIAL_ARTISANS.map((a: any) => ({
+  ...a,
+  isPublic: a.isPublic !== false,
+}));
 let inMemoryInquiries: any[] = [
   {
     id: "inq-1",
@@ -112,7 +120,8 @@ let inMemoryInquiries: any[] = [
     quantity: 2,
     inquiryType: "purchase_inquiry",
     message: "Namaste Sitadevi ji, I loved your Tree of Life painting! We want 2 pieces for our new eco-home. Can you do custom framing?",
-    status: "pending",
+    status: "new",
+    artisanReply: "",
     createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
   },
   {
@@ -126,10 +135,67 @@ let inMemoryInquiries: any[] = [
     quantity: 25,
     inquiryType: "bulk_retail",
     message: "Hello Rameshwar ji, we would like to order 25 sets of your non-toxic wooden stacking toys for our kindergarten classrooms.",
-    status: "accepted",
+    status: "responded",
+    artisanReply: "Namaste! Yes, we can prepare 25 sets in 12 days.",
     createdAt: new Date(Date.now() - 3600000 * 28).toISOString()
   }
 ];
+
+interface StoredAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  mobileNumber: string;
+  accountType: "artisan" | "buyer" | "organization";
+  organizationName?: string;
+  passwordSalt: string;
+  passwordHash: string;
+  languagePreference?: string;
+  notifyEnquiries?: boolean;
+  notifyTips?: boolean;
+  createdAt: string;
+}
+
+const AUTH_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString("hex");
+const registeredAccounts: StoredAccount[] = [];
+const revokedTokens = new Set<string>();
+
+function hashPassword(password: string, salt: string): string {
+  return crypto.scryptSync(password, salt, 64).toString("hex");
+}
+
+function signAuthToken(userId: string): string {
+  const payload = Buffer.from(JSON.stringify({ sub: userId, iat: Date.now() })).toString("base64url");
+  const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
+  return `${payload}.${sig}`;
+}
+
+function verifyAuthToken(token: string): string | null {
+  if (!token || revokedTokens.has(token)) return null;
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+  const [payload, sig] = parts;
+  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
+  const sigBuf = Buffer.from(sig);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    return parsed?.sub ? String(parsed.sub) : null;
+  } catch {
+    return null;
+  }
+}
+
+function getAuthenticatedAccount(req: Request): StoredAccount | null {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  const userId = verifyAuthToken(token);
+  if (!userId) return null;
+  return registeredAccounts.find(a => a.id === userId) || null;
+}
 
 // ==============================================================================
 // 1. HEALTH & SYSTEM STATUS ENDPOINT
@@ -149,233 +215,134 @@ app.get("/api/status", (req: Request, res: Response) => {
 });
 
 // ==============================================================================
-// 2. AI MULTIMODAL PRODUCT DETECTION & SMART CATALOGING (GUARDRAILED ENGINE)
+// 2. AI MULTIMODAL PRODUCT DETECTION & SMART CATALOGING (HONEST AI ONLY)
 // ==============================================================================
 app.post("/api/ai/analyze-product", async (req: Request, res: Response) => {
   try {
-    const { imageBase64, mimeType = "image/jpeg", voiceDescription = "", language = "en" } = req.body;
+    const { imageBase64, mimeType = "image/jpeg", voiceDescription = "", language = "en" } = req.body || {};
+    const queryDescription = String(voiceDescription || "").trim();
 
-    const queryDescription = (voiceDescription || "").trim() || "Handcrafted traditional Indian folk art creation";
-
-    const ai = getAI();
-    if (ai) {
-      const prompt = `# ROLE & GOAL
-You are the core intelligence engine for "Artisan" (an AI-powered Direct Artisan-to-Market platform). Your mission is to analyze craft images and artisan voice notes, evaluate GI/heritage authenticity, calculate transparent living wages, and generate cultural marketing narratives.
-
-You must strictly eliminate AI hallucinations, false certifications, misleading prices, and deceptive outputs.
-
-# CONSTRAINTS & GUARDRAILS (STRICT COMPLIANCE)
-1. NO EXTERNAL TOOLS OR APIs: Rely exclusively on the provided image and text input. Do NOT assume, fabricate, or reference external databases, blockchain, or web tools.
-2. NO DIRECT MATHEMATICAL CALCULATIONS IN PROSE: All pricing must follow a strict, deterministic formula inside structured JSON. Do NOT guess arbitrary retail prices.
-3. NO UNVERIFIED GI CERTIFICATION: Never state that an item is legally "GI Tag Certified" unless the input explicitly confirms registered GI cooperative provenance. Mark unverified claims as "ESTIMATED_UNVERIFIED".
-4. CONFIDENCE SCORING: For visual and material analysis, assign a confidence score between 0.0 and 1.0. If confidence is below 0.85, set confidence_status to "REQUIRES_SHG_VERIFICATION" and explicitly state that human verification by an SHG lead is required. Otherwise set to "HIGH_CONFIDENCE".
-
-# DETERMINISTIC PRICING FORMULA
-When calculating prices, adhere strictly to this formula:
-- Total Direct Cost = Material Cost + (Labor Hours * Hourly Living Wage Rate)
-- Recommended Fair Selling Price = Total Direct Cost * 1.15 (15% platform/packaging reserve)
-- Artisan Take-Home Percentage = Minimum 85% of Selling Price
-
-# ARTISAN INPUT PROVIDED
-- Artisan Spoken / Written Notes: "${queryDescription}"
-${imageBase64 ? "- A photographic image of the craft item has been provided for visual analysis." : "- No image was provided. Note this in guardrail_warnings and assess based strictly on artisan notes."}
-
-# OUTPUT FORMAT CONTRACT
-You MUST return your response exclusively in the following valid JSON schema. Do not write introductory text, explanations, or conversational markdown outside the JSON block.
-
-{
-  "craft_analysis": {
-    "detected_category": "String (e.g. Paintings & Folk Art, Wooden Toys & Carvings, Ceramics & Pottery, Metalcraft & Bell Metal, Handloom & Textiles, Terracotta & Clay Art, Jewelry & Filigree, Leather & Jute Crafts)",
-    "detected_materials": ["String"],
-    "color_palette": ["String"],
-    "confidence_score": 0.0,
-    "confidence_status": "HIGH_CONFIDENCE | REQUIRES_SHG_VERIFICATION"
-  },
-  "gi_heritage_validation": {
-    "claimed_tradition": "String",
-    "gi_status": "OFFICIALLY_VERIFIED | ESTIMATED_UNVERIFIED",
-    "verification_notice": "String explain whether this is an official claim or visual estimate"
-  },
-  "fair_pricing_breakdown": {
-    "material_cost_inr": 0,
-    "hours_spent": 0,
-    "hourly_living_wage_inr": 0,
-    "total_direct_cost_inr": 0,
-    "recommended_selling_price_inr": 0,
-    "artisan_take_home_percentage": "87%"
-  },
-  "cultural_narrative": {
-    "title": "String",
-    "heritage_story": "String (focusing on craft history and technique)",
-    "product_description": "String"
-  },
-  "guardrail_warnings": [
-    "String (List any low-confidence warnings or missing required artisan inputs)"
-  ]
-}`;
-
-      try {
-        let contentsPayload: any;
-        if (imageBase64) {
-          const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-          contentsPayload = {
-            parts: [
-              {
-                inlineData: {
-                  data: base64Data,
-                  mimeType: mimeType || "image/jpeg",
-                },
-              },
-              { text: prompt },
-            ],
-          };
-        } else {
-          contentsPayload = {
-            parts: [{ text: prompt }],
-          };
-        }
-
-        const { text: rawText, modelUsed } = await generateWithModelFallback({
-          contents: contentsPayload,
-          config: {
-            responseMimeType: "application/json",
-          },
-        });
-
-        const parsed = safeParseJson(rawText);
-        if (parsed && typeof parsed === "object") {
-          // Normalize and verify deterministic pricing invariants
-          const pricing = parsed.fair_pricing_breakdown || {};
-          const matCost = Math.max(0, Number(pricing.material_cost_inr) || 250);
-          const hours = Math.max(1, Number(pricing.hours_spent) || 8);
-          const wage = Math.max(50, Number(pricing.hourly_living_wage_inr) || 100);
-          const totalDirectCost = matCost + (hours * wage);
-          const recommendedPrice = Math.round(totalDirectCost * 1.15);
-          const takeHomePct = "87%";
-
-          pricing.material_cost_inr = matCost;
-          pricing.hours_spent = hours;
-          pricing.hourly_living_wage_inr = wage;
-          pricing.total_direct_cost_inr = totalDirectCost;
-          pricing.recommended_selling_price_inr = recommendedPrice;
-          pricing.artisan_take_home_percentage = takeHomePct;
-
-          const craft = parsed.craft_analysis || {};
-          const score = typeof craft.confidence_score === "number" ? craft.confidence_score : 0.90;
-          craft.confidence_score = score;
-          craft.confidence_status = score < 0.85 ? "REQUIRES_SHG_VERIFICATION" : "HIGH_CONFIDENCE";
-
-          const gi = parsed.gi_heritage_validation || {};
-          const narrative = parsed.cultural_narrative || {};
-
-          // Construct normalized unified contract response (backward-compatible with UI while preserving contract)
-          const normalized = {
-            ...parsed,
-            title: narrative.title || "Handcrafted Heritage Art",
-            category: craft.detected_category || "Traditional Handcraft",
-            materials: craft.detected_materials || ["Authentic Natural Materials"],
-            primaryColors: craft.color_palette || ["Earthy Brown", "Ochre", "Natural"],
-            description: narrative.product_description || "",
-            culturalStory: narrative.heritage_story || "",
-            confidence_score: craft.confidence_score,
-            confidence_status: craft.confidence_status,
-            gi_status: gi.gi_status || "ESTIMATED_UNVERIFIED",
-            verification_notice: gi.verification_notice || "Visual and cultural estimate based on artisan description.",
-            hasGiTag: gi.gi_status === "OFFICIALLY_VERIFIED",
-            suggestedMaterialCost: matCost,
-            suggestedLaborHours: hours,
-            suggestedHourlyRate: wage,
-            suggestedPrice: recommendedPrice,
-            marketBenchmark: Math.round(recommendedPrice * 1.8),
-            tags: [
-              craft.detected_category || "Handicraft",
-              gi.claimed_tradition || "HeritageArt",
-              "ArtisanDirect",
-              "FairLivingWage",
-              "HandmadeInIndia"
-            ]
-          };
-
-          return res.json({ success: true, analysis: normalized, rawContract: parsed, modelUsed });
-        }
-      } catch (geminiError: any) {
-        console.info("Gemini analysis fallback:", geminiError?.message || geminiError);
-      }
+    if (!imageBase64 && !queryDescription) {
+      return res.status(400).json({
+        success: false,
+        error: "Please upload a product photograph or describe your craft first."
+      });
     }
 
-    // Deterministic Fallback engine strictly adhering to formula
-    const isVoiceToy = queryDescription.toLowerCase().includes("toy") || queryDescription.toLowerCase().includes("wood") || queryDescription.toLowerCase().includes("channapatna");
-    const isVoiceBrass = queryDescription.toLowerCase().includes("brass") || queryDescription.toLowerCase().includes("metal") || queryDescription.toLowerCase().includes("dhokra");
-    const isVoicePottery = queryDescription.toLowerCase().includes("pottery") || queryDescription.toLowerCase().includes("clay") || queryDescription.toLowerCase().includes("mitti");
+    const ai = getAI();
+    if (!ai) {
+      return res.status(503).json({
+        success: false,
+        aiUnavailable: true,
+        error: "AI analysis service is not configured or unavailable right now. You can enter your product details manually."
+      });
+    }
 
-    const fallbackMatCost = isVoiceBrass ? 450 : isVoiceToy ? 200 : 250;
-    const fallbackHours = isVoiceBrass ? 14 : isVoiceToy ? 6 : 10;
-    const fallbackHourlyWage = 100;
-    const fallbackDirectCost = fallbackMatCost + (fallbackHours * fallbackHourlyWage);
-    const fallbackPrice = Math.round(fallbackDirectCost * 1.15);
+    const prompt = `# ROLE & GOAL
+You are helping an Indian artisan catalog a handmade craft from a photograph and optional notes.
 
-    const fallbackContract = {
-      craft_analysis: {
-        detected_category: isVoiceToy ? "Wooden Toys & Carvings" : isVoiceBrass ? "Metalcraft & Bell Metal" : isVoicePottery ? "Ceramics & Pottery" : "Paintings & Folk Art",
-        detected_materials: isVoiceToy ? ["Locally Sourced Hale Wood", "Natural Vegetable Lacquer"] : isVoiceBrass ? ["Recycled Brass Alloy", "Beeswax", "Clay"] : ["Natural Mineral Pigments", "Handmade Cotton Rag Paper"],
-        color_palette: ["Warm Ochre", "Natural Earth", "Deep Crimson"],
-        confidence_score: 0.88,
-        confidence_status: "HIGH_CONFIDENCE"
-      },
-      gi_heritage_validation: {
-        claimed_tradition: isVoiceToy ? "Channapatna Wooden Toys" : isVoiceBrass ? "Bastar Dhokra Bell Metal" : "Traditional Folk Art",
-        gi_status: "ESTIMATED_UNVERIFIED",
-        verification_notice: "Estimated unverified: Visual estimate from artisan description without verified cooperative certificate upload."
-      },
-      fair_pricing_breakdown: {
-        material_cost_inr: fallbackMatCost,
-        hours_spent: fallbackHours,
-        hourly_living_wage_inr: fallbackHourlyWage,
-        total_direct_cost_inr: fallbackDirectCost,
-        recommended_selling_price_inr: fallbackPrice,
-        artisan_take_home_percentage: "87%"
-      },
-      cultural_narrative: {
-        title: isVoiceToy ? "Channapatna Handcrafted Natural Lacquer Toy" : isVoiceBrass ? "Bastar Dhokra Bell Metal Artifact" : "Handcrafted Artisan Heritage Folk Art",
-        heritage_story: "Rooted in centuries-old regional artisan clusters, utilizing ecological hand-tool techniques passed down through generational mastery.",
-        product_description: "An authentic, sustainable creation directly made by a traditional artisan. Every detail reflects cultural heritage, non-toxic materials, and hours of patient craftsmanship."
-      },
-      guardrail_warnings: [
-        "GI status is marked ESTIMATED_UNVERIFIED pending cooperative registration documentation.",
-        imageBase64 ? "Image visual check passed." : "No photo uploaded: estimated based strictly on artisan notes."
-      ]
-    };
+# STRICT HONESTY RULES
+1. Examine only the provided photograph and artisan notes. Never fabricate certifications, fake GI tags, or unverified claims.
+2. MATERIALS RULE: Only list materials inside "detected_materials" when they are clearly visually identifiable from the photograph or explicitly mentioned in the artisan notes. If materials cannot be determined reliably from the photo, return an empty array [] and note in "missing_material_prompt" a polite short question asking the artisan what materials they used.
+3. Return helpful craft category, concise buyer-friendly product title, clear description, relevant tags, and search keywords.
+4. Reply language preference code: "${language}" (use simple, warm language).
 
-    const normalizedFallback = {
-      ...fallbackContract,
-      title: fallbackContract.cultural_narrative.title,
-      category: fallbackContract.craft_analysis.detected_category,
-      materials: fallbackContract.craft_analysis.detected_materials,
-      primaryColors: fallbackContract.craft_analysis.color_palette,
-      description: fallbackContract.cultural_narrative.product_description,
-      culturalStory: fallbackContract.cultural_narrative.heritage_story,
-      confidence_score: fallbackContract.craft_analysis.confidence_score,
-      confidence_status: fallbackContract.craft_analysis.confidence_status,
-      gi_status: fallbackContract.gi_heritage_validation.gi_status,
-      verification_notice: fallbackContract.gi_heritage_validation.verification_notice,
-      hasGiTag: false,
-      suggestedMaterialCost: fallbackMatCost,
-      suggestedLaborHours: fallbackHours,
-      suggestedHourlyRate: fallbackHourlyWage,
-      suggestedPrice: fallbackPrice,
-      marketBenchmark: Math.round(fallbackPrice * 1.8),
-      tags: ["HeritageCraft", "ArtisanDirect", "FairLivingWage", "HandmadeInIndia"]
-    };
+# ARTISAN NOTES PROVIDED
+${queryDescription ? `"${queryDescription}"` : "(No written or spoken notes provided — analyze purely from the uploaded photograph.)"}
 
-    return res.json({
-      success: true,
-      analysis: normalizedFallback,
-      rawContract: fallbackContract,
-      modelUsed: "deterministic-guardrail-engine"
-    });
+# OUTPUT FORMAT CONTRACT
+Return exclusively valid JSON matching this structure:
+{
+  "title": "Concise handmade product name",
+  "detected_category": "One of: Pottery, Textiles, Woodwork, Bamboo and Cane, Jewellery, Folk Art, Paintings & Folk Art, Ceramics & Pottery, Metalcraft & Bell Metal, Handloom & Textiles",
+  "detected_materials": ["Only visually confirmed materials, or empty [] if uncertain"],
+  "missing_material_prompt": "Short friendly question if materials are unclear, else empty string",
+  "product_description": "2-4 warm sentences describing the craft, appearance, and use",
+  "heritage_story": "1-2 short sentences about traditional Indian craftsmanship",
+  "tags": ["4 to 6 short relevant tags without #"],
+  "keywords": ["5 to 8 search keywords buyers might type"],
+  "confidence_score": 0.0
+}`;
+
+    try {
+      let contentsPayload: any;
+      if (imageBase64) {
+        const base64Data = String(imageBase64).replace(/^data:image\/\w+;base64,/, "");
+        contentsPayload = {
+          parts: [
+            {
+              inlineData: {
+                data: base64Data,
+                mimeType: mimeType || "image/jpeg",
+              },
+            },
+            { text: prompt },
+          ],
+        };
+      } else {
+        contentsPayload = {
+          parts: [{ text: prompt }],
+        };
+      }
+
+      const { text: rawText, modelUsed } = await generateWithModelFallback({
+        contents: contentsPayload,
+        config: {
+          responseMimeType: "application/json",
+        },
+      });
+
+      const parsed = safeParseJson(rawText);
+      if (parsed && typeof parsed === "object") {
+        const materials = Array.isArray(parsed.detected_materials)
+          ? parsed.detected_materials.map((m: any) => String(m).trim()).filter(Boolean)
+          : [];
+        const tags = Array.isArray(parsed.tags)
+          ? parsed.tags.map((t: any) => String(t).replace(/^#/, "").trim()).filter(Boolean)
+          : [];
+        const keywords = Array.isArray(parsed.keywords)
+          ? parsed.keywords.map((k: any) => String(k).trim()).filter(Boolean)
+          : [];
+
+        const normalized = {
+          title: String(parsed.title || "").trim(),
+          category: String(parsed.detected_category || "Folk Art").trim(),
+          materials,
+          materialsUnclear: materials.length === 0,
+          missingMaterialPrompt: String(
+            parsed.missing_material_prompt ||
+              (materials.length === 0 ? "We could not clearly tell the materials from the photo. Please enter the materials you used." : "")
+          ).trim(),
+          description: String(parsed.product_description || "").trim(),
+          culturalStory: String(parsed.heritage_story || "").trim(),
+          tags,
+          keywords,
+          confidence_score: typeof parsed.confidence_score === "number" ? parsed.confidence_score : 0.88,
+        };
+
+        return res.json({ success: true, analysis: normalized, modelUsed });
+      }
+
+      return res.status(502).json({
+        success: false,
+        aiUnavailable: true,
+        error: "AI returned an unreadable response. Please fill in your product details manually."
+      });
+    } catch (geminiError: any) {
+      console.info("Gemini analysis unavailable:", geminiError?.message || geminiError);
+      return res.status(503).json({
+        success: false,
+        aiUnavailable: true,
+        error: "The AI helper could not analyze this photo right now. Please enter the product details manually below."
+      });
+    }
   } catch (err: any) {
     console.error("Analysis route error:", err);
-    res.status(500).json({ error: "Failed to analyze craft photo", details: err.message });
+    return res.status(500).json({
+      success: false,
+      aiUnavailable: true,
+      error: "Something went wrong analyzing the photo. You can fill in product details manually."
+    });
   }
 });
 
@@ -570,10 +537,25 @@ Return ONLY the translated text without commentary or quotes.`;
 // ==============================================================================
 app.get("/api/products", async (req: Request, res: Response) => {
   try {
-    const { category, state, search, maxPrice } = req.query;
+    const { category, state, search, maxPrice, scope, artisanId } = req.query;
+    const authUser = getAuthenticatedAccount(req);
 
-    // Filter in-memory craft catalog
     let results = [...inMemoryProducts];
+
+    if (scope === "mine") {
+      const targetArtisanId = authUser?.id || (artisanId ? String(artisanId) : "");
+      if (!targetArtisanId) {
+        return res.status(401).json({ error: "Please sign in to view your private product drafts." });
+      }
+      results = results.filter(p => p.artisanId === targetArtisanId);
+    } else {
+      // Public marketplace shows only published & artisan-approved products
+      results = results.filter(p => p.isApprovedByArtisan !== false && p.status !== "draft");
+      if (artisanId) {
+        results = results.filter(p => p.artisanId === String(artisanId));
+      }
+    }
+
     if (category && category !== "All Categories") {
       results = results.filter(p => p.category.toLowerCase() === String(category).toLowerCase());
     }
@@ -590,6 +572,7 @@ app.get("/api/products", async (req: Request, res: Response) => {
         p.category.toLowerCase().includes(q) ||
         p.originState.toLowerCase().includes(q) ||
         (Array.isArray(p.tags) && p.tags.some((t: string) => t.toLowerCase().includes(q))) ||
+        (Array.isArray(p.keywords) && p.keywords.some((k: string) => k.toLowerCase().includes(q))) ||
         p.description.toLowerCase().includes(q)
       );
     }
@@ -602,38 +585,55 @@ app.get("/api/products", async (req: Request, res: Response) => {
 
 app.post("/api/products", async (req: Request, res: Response) => {
   try {
-    const productData = req.body;
+    const authUser = getAuthenticatedAccount(req);
+    const productData = req.body || {};
+    const status = productData.status === "draft" || productData.isApprovedByArtisan === false ? "draft" : "published";
+    const images = Array.isArray(productData.images) && productData.images.length > 0
+      ? productData.images.filter((img: any) => typeof img === "string" && img.trim())
+      : [productData.enhancedImageUrl || productData.imageUrl || "./assets/artisan_logo.jpg"];
+
+    const materials = Array.isArray(productData.materials)
+      ? productData.materials
+      : typeof productData.materials === "string" && productData.materials.trim()
+      ? productData.materials.split(",").map((m: string) => m.trim()).filter(Boolean)
+      : ["Natural Materials"];
+
+    const artisanProfile = inMemoryArtisans.find(a => a.id === (authUser?.id || productData.artisanId));
     const newId = `prod-${Date.now()}`;
     const newProduct = {
       id: newId,
-      artisanId: productData.artisanId || "artisan-1",
-      title: productData.title || "Handcrafted Heritage Art",
+      artisanId: authUser?.id || productData.artisanId || "artisan-1",
+      title: String(productData.title || "Handcrafted Heritage Art").trim(),
       titleRegional: productData.titleRegional || {},
       category: productData.category || "Paintings & Folk Art",
-      materials: productData.materials || ["Natural Materials"],
+      materials,
       primaryColors: productData.primaryColors || ["Earth Tones"],
       craftTechnique: productData.craftTechnique || "Handmade",
-      dimensions: productData.dimensions || "Custom",
-      weightGrams: productData.weightGrams || 250,
-      description: productData.description || "",
+      dimensions: String(productData.dimensions || "Standard").trim(),
+      weightGrams: Number(productData.weightGrams) || 250,
+      description: String(productData.description || "").trim(),
       descriptionRegional: productData.descriptionRegional || {},
-      culturalStory: productData.culturalStory || "",
+      culturalStory: String(productData.culturalStory || "").trim(),
       careInstructions: productData.careInstructions || "Dust with clean cloth",
-      tags: productData.tags || ["Handmade"],
-      materialCost: Number(productData.materialCost) || 200,
-      laborHours: Number(productData.laborHours) || 8,
-      hourlyRate: Number(productData.hourlyRate) || 85,
-      overheadCost: Number(productData.overheadCost) || 50,
-      profitMarginPercent: Number(productData.profitMarginPercent) || 25,
-      finalPrice: Number(productData.finalPrice) || 1200,
-      marketBenchmarkPrice: Number(productData.marketBenchmarkPrice) || 2200,
-      imageUrl: productData.imageUrl || "",
-      enhancedImageUrl: productData.enhancedImageUrl || productData.imageUrl || "",
+      tags: Array.isArray(productData.tags) ? productData.tags : ["Handmade"],
+      keywords: Array.isArray(productData.keywords) ? productData.keywords : [],
+      materialCost: Number(productData.materialCost) || 0,
+      laborHours: Number(productData.laborHours) || 0,
+      hourlyRate: Number(productData.hourlyRate) || 0,
+      packagingCost: Number(productData.packagingCost) || 0,
+      overheadCost: Number(productData.overheadCost) || 0,
+      profitMarginPercent: Number(productData.profitMarginPercent) || 0,
+      finalPrice: Math.max(1, Number(productData.finalPrice) || 500),
+      marketBenchmarkPrice: Number(productData.marketBenchmarkPrice) || 0,
+      images,
+      imageUrl: images[0],
+      enhancedImageUrl: productData.enhancedImageUrl || images[0],
       backgroundStyle: productData.backgroundStyle || "studio_white",
       stockQuantity: Number(productData.stockQuantity) || 1,
       isInStock: true,
-      isApprovedByArtisan: true,
-      originState: productData.originState || "Bihar",
+      status,
+      isApprovedByArtisan: status === "published",
+      originState: productData.originState || artisanProfile?.state || "India",
       hasGiTag: Boolean(productData.hasGiTag),
       createdAt: new Date().toISOString()
     };
@@ -647,22 +647,74 @@ app.post("/api/products", async (req: Request, res: Response) => {
 
 app.put("/api/products/:id", (req: Request, res: Response) => {
   try {
+    const authUser = getAuthenticatedAccount(req);
     const idx = inMemoryProducts.findIndex(p => p.id === req.params.id);
     if (idx === -1) {
       return res.status(404).json({ error: "Product not found" });
     }
+    if (authUser && inMemoryProducts[idx].artisanId !== authUser.id) {
+      return res.status(403).json({ error: "You can only edit your own products." });
+    }
+
     const updates = req.body || {};
+    const nextStatus = updates.status !== undefined
+      ? (updates.status === "draft" ? "draft" : "published")
+      : updates.isApprovedByArtisan !== undefined
+      ? (updates.isApprovedByArtisan ? "published" : "draft")
+      : inMemoryProducts[idx].status;
+
+    const nextImages = Array.isArray(updates.images) && updates.images.length > 0
+      ? updates.images.filter((img: any) => typeof img === "string" && img.trim())
+      : undefined;
+
+    const nextMaterials = Array.isArray(updates.materials)
+      ? updates.materials
+      : typeof updates.materials === "string"
+      ? updates.materials.split(",").map((m: string) => m.trim()).filter(Boolean)
+      : undefined;
+
     inMemoryProducts[idx] = {
       ...inMemoryProducts[idx],
-      ...(updates.title !== undefined ? { title: updates.title } : {}),
+      ...(updates.title !== undefined ? { title: String(updates.title).trim() } : {}),
       ...(updates.category !== undefined ? { category: updates.category } : {}),
-      ...(updates.finalPrice !== undefined ? { finalPrice: Number(updates.finalPrice) } : {}),
-      ...(updates.description !== undefined ? { description: updates.description } : {}),
-      ...(updates.isApprovedByArtisan !== undefined ? { isApprovedByArtisan: Boolean(updates.isApprovedByArtisan) } : {}),
+      ...(updates.finalPrice !== undefined ? { finalPrice: Math.max(1, Number(updates.finalPrice)) } : {}),
+      ...(updates.description !== undefined ? { description: String(updates.description) } : {}),
+      ...(updates.culturalStory !== undefined ? { culturalStory: String(updates.culturalStory) } : {}),
+      ...(updates.dimensions !== undefined ? { dimensions: String(updates.dimensions) } : {}),
+      ...(nextMaterials !== undefined ? { materials: nextMaterials } : {}),
+      ...(Array.isArray(updates.tags) ? { tags: updates.tags } : {}),
+      ...(Array.isArray(updates.keywords) ? { keywords: updates.keywords } : {}),
+      ...(updates.materialCost !== undefined ? { materialCost: Number(updates.materialCost) } : {}),
+      ...(updates.laborHours !== undefined ? { laborHours: Number(updates.laborHours) } : {}),
+      ...(updates.hourlyRate !== undefined ? { hourlyRate: Number(updates.hourlyRate) } : {}),
+      ...(updates.packagingCost !== undefined ? { packagingCost: Number(updates.packagingCost) } : {}),
+      ...(updates.overheadCost !== undefined ? { overheadCost: Number(updates.overheadCost) } : {}),
+      ...(updates.profitMarginPercent !== undefined ? { profitMarginPercent: Number(updates.profitMarginPercent) } : {}),
+      ...(nextImages ? { images: nextImages, imageUrl: nextImages[0], enhancedImageUrl: nextImages[0] } : {}),
+      status: nextStatus,
+      isApprovedByArtisan: nextStatus === "published",
+      updatedAt: new Date().toISOString(),
     };
     res.json({ success: true, product: inMemoryProducts[idx] });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to update product", details: err.message });
+  }
+});
+
+app.delete("/api/products/:id", (req: Request, res: Response) => {
+  try {
+    const authUser = getAuthenticatedAccount(req);
+    const idx = inMemoryProducts.findIndex(p => p.id === req.params.id);
+    if (idx === -1) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    if (authUser && inMemoryProducts[idx].artisanId !== authUser.id) {
+      return res.status(403).json({ error: "You can only delete your own products." });
+    }
+    const [removed] = inMemoryProducts.splice(idx, 1);
+    return res.json({ success: true, deletedId: removed.id });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to delete product", details: err.message });
   }
 });
 
@@ -806,12 +858,82 @@ app.get("/api/material-benchmarks", (req: Request, res: Response) => {
 // 6. ARTISANS PROFILE API
 // ==============================================================================
 app.get("/api/artisans", (req: Request, res: Response) => {
-  res.json({ artisans: inMemoryArtisans });
+  res.json({ artisans: inMemoryArtisans.filter(a => a.isPublic !== false) });
+});
+
+app.get("/api/artisans/me", (req: Request, res: Response) => {
+  const authUser = getAuthenticatedAccount(req);
+  if (!authUser) {
+    return res.status(401).json({ error: "Please sign in to view your profile." });
+  }
+  const artisan = inMemoryArtisans.find(a => a.id === authUser.id);
+  if (!artisan) {
+    return res.status(404).json({ error: "Artisan profile not found." });
+  }
+  return res.json({ artisan });
+});
+
+app.put("/api/artisans/me", (req: Request, res: Response) => {
+  const authUser = getAuthenticatedAccount(req);
+  const targetId = authUser?.id || req.body?.id;
+  if (!targetId) {
+    return res.status(401).json({ error: "Authentication required to update profile." });
+  }
+
+  const updates = req.body || {};
+  const idx = inMemoryArtisans.findIndex(a => a.id === targetId);
+  const patch = {
+    ...(updates.fullName !== undefined ? { fullName: String(updates.fullName).trim() } : {}),
+    ...(updates.profileImage !== undefined ? { profileImage: String(updates.profileImage) } : {}),
+    ...(updates.districtVillage !== undefined ? { districtVillage: String(updates.districtVillage).trim() } : {}),
+    ...(updates.state !== undefined ? { state: String(updates.state).trim() } : {}),
+    ...(updates.craftSpecialty !== undefined ? { craftSpecialty: String(updates.craftSpecialty).trim() } : {}),
+    ...(updates.yearsExperience !== undefined ? { yearsExperience: Math.max(0, Number(updates.yearsExperience) || 0) } : {}),
+    ...(updates.bio !== undefined ? { bio: String(updates.bio).trim() } : {}),
+    ...(updates.craftTradition !== undefined ? { craftTradition: String(updates.craftTradition).trim() } : {}),
+    ...(updates.phone !== undefined ? { phone: String(updates.phone).trim() } : {}),
+    ...(updates.email !== undefined ? { email: String(updates.email).trim() } : {}),
+    ...(updates.isPublic !== undefined ? { isPublic: Boolean(updates.isPublic) } : {}),
+  };
+
+  if (idx >= 0) {
+    inMemoryArtisans[idx] = { ...inMemoryArtisans[idx], ...patch };
+    if (authUser && patch.fullName) authUser.fullName = patch.fullName;
+    return res.json({ success: true, artisan: inMemoryArtisans[idx] });
+  }
+
+  const created = {
+    id: targetId,
+    fullName: patch.fullName || authUser?.fullName || "Artisan",
+    phone: patch.phone || authUser?.mobileNumber || "",
+    email: patch.email || authUser?.email || "",
+    state: patch.state || "India",
+    districtVillage: patch.districtVillage || "Craft Workshop",
+    craftSpecialty: patch.craftSpecialty || "Traditional Handcrafts",
+    craftTradition: patch.craftTradition || "",
+    yearsExperience: patch.yearsExperience ?? 1,
+    bio: patch.bio || "",
+    profileImage: patch.profileImage || "./assets/sitadevi_profile.jpg",
+    isVerified: true,
+    isPublic: patch.isPublic !== false,
+  };
+  inMemoryArtisans.push(created);
+  return res.json({ success: true, artisan: created });
 });
 
 app.get("/api/artisans/:id", (req: Request, res: Response) => {
-  const artisan = inMemoryArtisans.find(a => a.id === req.params.id) || inMemoryArtisans[0];
-  res.json({ artisan });
+  const authUser = getAuthenticatedAccount(req);
+  const artisan = inMemoryArtisans.find(a => a.id === req.params.id);
+  if (!artisan) {
+    return res.status(404).json({ error: "Artisan profile not found." });
+  }
+  if (artisan.isPublic === false && authUser?.id !== artisan.id) {
+    return res.status(404).json({ error: "This artisan profile is private." });
+  }
+  const products = inMemoryProducts.filter(
+    p => p.artisanId === artisan.id && p.status !== "draft" && p.isApprovedByArtisan !== false
+  );
+  res.json({ artisan, products });
 });
 
 app.post("/api/artisans", (req: Request, res: Response) => {
@@ -824,21 +946,32 @@ app.post("/api/artisans", (req: Request, res: Response) => {
   const newArtisan = {
     id: `artisan-${Date.now()}`,
     ...profile,
-    isVerified: true
+    isVerified: true,
+    isPublic: profile.isPublic !== false,
   };
   inMemoryArtisans.push(newArtisan);
   res.status(201).json({ success: true, artisan: newArtisan });
 });
 
 // ==============================================================================
-// 7. BUYER INQUIRIES & MARKET LINKAGE
+// 7. BUYER INQUIRIES & MARKET LINKAGE (ARTISAN-SCOPED + STATUS MANAGEMENT)
 // ==============================================================================
 app.get("/api/inquiries", (req: Request, res: Response) => {
+  const authUser = getAuthenticatedAccount(req);
   const { artisanId } = req.query;
-  let leads = inMemoryInquiries;
-  if (artisanId) {
-    leads = leads.filter(l => l.artisanId === artisanId);
+
+  const targetArtisanId = authUser?.id || (artisanId ? String(artisanId) : "");
+  if (!targetArtisanId) {
+    return res.json({ inquiries: [] });
   }
+
+  const ownedProductIds = new Set(
+    inMemoryProducts.filter(p => p.artisanId === targetArtisanId).map(p => p.id)
+  );
+
+  const leads = inMemoryInquiries.filter(
+    l => l.artisanId === targetArtisanId || ownedProductIds.has(l.productId)
+  );
   res.json({ inquiries: leads });
 });
 
@@ -846,22 +979,26 @@ app.post("/api/inquiries", async (req: Request, res: Response) => {
   try {
     const { productId, artisanId, buyerName, buyerPhone, buyerEmail, buyerLocation, quantity = 1, message = "" } = req.body;
 
-    if (!buyerName || !buyerPhone) {
-      return res.status(400).json({ error: "Buyer name and phone are required" });
+    if (!buyerName || (!buyerPhone && !buyerEmail)) {
+      return res.status(400).json({ error: "Buyer name and phone or email are required." });
     }
+
+    const productMatch = inMemoryProducts.find(p => p.id === productId);
+    const resolvedArtisanId = productMatch?.artisanId || artisanId || "artisan-1";
 
     const newInquiry = {
       id: `inq-${Date.now()}`,
       productId: productId || "prod-1",
-      artisanId: artisanId || "artisan-1",
-      buyerName,
-      buyerPhone,
-      buyerEmail: buyerEmail || "",
-      buyerLocation: buyerLocation || "India",
+      artisanId: resolvedArtisanId,
+      buyerName: String(buyerName).trim(),
+      buyerPhone: String(buyerPhone || "").trim(),
+      buyerEmail: String(buyerEmail || "").trim(),
+      buyerLocation: String(buyerLocation || "India").trim(),
       quantity: Number(quantity) || 1,
       inquiryType: "purchase_inquiry",
-      message: message || "Interested in purchasing this craft.",
-      status: "pending",
+      message: String(message || "Interested in purchasing this craft.").trim(),
+      status: "new",
+      artisanReply: "",
       createdAt: new Date().toISOString()
     };
 
@@ -872,24 +1009,43 @@ app.post("/api/inquiries", async (req: Request, res: Response) => {
   }
 });
 
+app.patch("/api/inquiries/:id", (req: Request, res: Response) => {
+  try {
+    const authUser = getAuthenticatedAccount(req);
+    const idx = inMemoryInquiries.findIndex(i => i.id === req.params.id);
+    if (idx === -1) {
+      return res.status(404).json({ error: "Enquiry not found." });
+    }
+
+    if (authUser) {
+      const ownedProdIds = new Set(
+        inMemoryProducts.filter(p => p.artisanId === authUser.id).map(p => p.id)
+      );
+      if (inMemoryInquiries[idx].artisanId !== authUser.id && !ownedProdIds.has(inMemoryInquiries[idx].productId)) {
+        return res.status(403).json({ error: "You can only respond to enquiries for your own products." });
+      }
+    }
+
+    const { status, artisanReply } = req.body || {};
+    const validStatus = status === "responded" || status === "closed" || status === "new"
+      ? status
+      : inMemoryInquiries[idx].status;
+
+    inMemoryInquiries[idx] = {
+      ...inMemoryInquiries[idx],
+      status: validStatus,
+      ...(artisanReply !== undefined ? { artisanReply: String(artisanReply).trim() } : {}),
+      updatedAt: new Date().toISOString(),
+    };
+    return res.json({ success: true, inquiry: inMemoryInquiries[idx] });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to update enquiry", details: err.message });
+  }
+});
+
 // ==============================================================================
 // 7B. AUTHENTICATION & CONTACT ENDPOINTS (REAL SCRYPT + HMAC-SHA256 SESSIONS)
 // ==============================================================================
-interface StoredAccount {
-  id: string;
-  fullName: string;
-  email: string;
-  mobileNumber: string;
-  accountType: "artisan" | "buyer" | "organization";
-  organizationName?: string;
-  passwordSalt: string;
-  passwordHash: string;
-  createdAt: string;
-}
-
-const AUTH_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString("hex");
-const registeredAccounts: StoredAccount[] = [];
-const revokedTokens = new Set<string>();
 const contactMessages: Array<{
   id: string;
   name: string;
@@ -898,35 +1054,6 @@ const contactMessages: Array<{
   message: string;
   createdAt: string;
 }> = [];
-
-function hashPassword(password: string, salt: string): string {
-  return crypto.scryptSync(password, salt, 64).toString("hex");
-}
-
-function signAuthToken(userId: string): string {
-  const payload = Buffer.from(JSON.stringify({ sub: userId, iat: Date.now() })).toString("base64url");
-  const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
-  return `${payload}.${sig}`;
-}
-
-function verifyAuthToken(token: string): string | null {
-  if (!token || revokedTokens.has(token)) return null;
-  const parts = token.split(".");
-  if (parts.length !== 2) return null;
-  const [payload, sig] = parts;
-  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
-  const sigBuf = Buffer.from(sig);
-  const expBuf = Buffer.from(expected);
-  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    return parsed?.sub ? String(parsed.sub) : null;
-  } catch {
-    return null;
-  }
-}
 
 function sanitizeAccount(acc: StoredAccount) {
   return {
@@ -1045,6 +1172,70 @@ app.post("/api/auth/logout", (req: Request, res: Response) => {
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
   if (token) revokedTokens.add(token);
   return res.json({ success: true });
+});
+
+app.put("/api/auth/account", (req: Request, res: Response) => {
+  const account = getAuthenticatedAccount(req);
+  if (!account) {
+    return res.status(401).json({ success: false, error: "Please sign in to update account settings." });
+  }
+  const { fullName, mobileNumber, email, languagePreference, notifyEnquiries, notifyTips } = req.body || {};
+  if (fullName !== undefined && String(fullName).trim().length >= 2) {
+    account.fullName = String(fullName).trim();
+  }
+  if (mobileNumber !== undefined && String(mobileNumber).trim().length >= 8) {
+    account.mobileNumber = String(mobileNumber).trim();
+  }
+  if (email !== undefined && String(email).includes("@")) {
+    account.email = String(email).trim().toLowerCase();
+  }
+  if (languagePreference !== undefined) {
+    account.languagePreference = String(languagePreference);
+  }
+  if (notifyEnquiries !== undefined) {
+    account.notifyEnquiries = Boolean(notifyEnquiries);
+  }
+  if (notifyTips !== undefined) {
+    account.notifyTips = Boolean(notifyTips);
+  }
+
+  const artisan = inMemoryArtisans.find(a => a.id === account.id);
+  if (artisan) {
+    artisan.fullName = account.fullName;
+    artisan.phone = account.mobileNumber;
+    artisan.email = account.email;
+  }
+
+  return res.json({
+    success: true,
+    user: {
+      ...sanitizeAccount(account),
+      languagePreference: account.languagePreference,
+      notifyEnquiries: account.notifyEnquiries !== false,
+      notifyTips: account.notifyTips !== false,
+    },
+  });
+});
+
+app.post("/api/auth/change-password", (req: Request, res: Response) => {
+  const account = getAuthenticatedAccount(req);
+  if (!account) {
+    return res.status(401).json({ success: false, error: "Please sign in to change your password." });
+  }
+  const { currentPassword, newPassword } = req.body || {};
+  if (!currentPassword || !newPassword || String(newPassword).length < 6) {
+    return res.status(400).json({ success: false, error: "Please enter your current password and a new password (at least 6 characters)." });
+  }
+  const candidateHash = hashPassword(String(currentPassword), account.passwordSalt);
+  const aBuf = Buffer.from(candidateHash, "hex");
+  const bBuf = Buffer.from(account.passwordHash, "hex");
+  if (aBuf.length !== bBuf.length || !crypto.timingSafeEqual(aBuf, bBuf)) {
+    return res.status(401).json({ success: false, error: "Current password is incorrect." });
+  }
+  const nextSalt = crypto.randomBytes(16).toString("hex");
+  account.passwordSalt = nextSalt;
+  account.passwordHash = hashPassword(String(newPassword), nextSalt);
+  return res.json({ success: true, message: "Password updated successfully." });
 });
 
 app.post("/api/contact", (req: Request, res: Response) => {
