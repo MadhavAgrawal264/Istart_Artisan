@@ -40,7 +40,7 @@ const ICONS = {
     </svg>
   `,
   check: `
-    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg class="w-3.5 h-3.5 text-[#292929]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <polyline points="20 6 9 17 4 12"></polyline>
     </svg>
   `,
@@ -98,24 +98,24 @@ export function renderFinancialTimelineHTML(currentStatus: MilestoneStatus = "li
     let stepBadge = "";
 
     if (isCompleted) {
-      circleClasses = "bg-[#414A37] text-white border-4 border-[#E9DFD0]";
-      labelColor = "text-[#414A37] font-bold";
+      circleClasses = "bg-[#B8C77B] text-[#292929] border-4 border-[#DCE5C5]";
+      labelColor = "text-[#292929] font-bold";
       stepBadge = `
-        <span class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#414A37] flex items-center justify-center border-2 border-white">
+        <span class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#DCE5C5] flex items-center justify-center border-2 border-white">
           ${ICONS.check}
         </span>
       `;
     } else if (isCurrent) {
-      circleClasses = "bg-[#B9674B] text-white border-4 border-[#E9DFD0] ring-2 ring-[#B9674B]/25";
-      labelColor = "text-[#B9674B] font-bold";
+      circleClasses = "bg-[#EBC5A9] text-[#292929] border-4 border-[#FAFAF8] ring-2 ring-[#B8C77B]";
+      labelColor = "text-[#292929] font-bold";
       stepBadge = `
-        <span class="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-[#414A37] text-[9px] font-bold text-[#F8F5EF] uppercase border border-white">
+        <span class="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-[#B8C77B] text-[9px] font-bold text-[#292929] uppercase border border-white">
           Now
         </span>
       `;
     } else {
-      circleClasses = "bg-[#F8F5EF] text-[#66625A] border-4 border-[#DDD3C3]";
-      labelColor = "text-[#66625A] font-medium";
+      circleClasses = "bg-[#FAFAF8] text-[#5C5C57] border-4 border-[#E6E4DD]";
+      labelColor = "text-[#5C5C57] font-medium";
     }
 
     return `
@@ -139,7 +139,7 @@ export function renderFinancialTimelineHTML(currentStatus: MilestoneStatus = "li
             <span class="text-xs sm:text-sm ${labelColor} leading-tight">${step.label}</span>
             <button
               type="button"
-              class="audio-btn p-1 rounded-full text-[#66625A] hover:text-[#414A37] hover:bg-[#E9DFD0] cursor-pointer"
+              class="audio-btn p-1 rounded-full text-[#5C5C57] hover:text-[#292929] hover:bg-[#DCE5C5] cursor-pointer"
               data-audio-text="${step.label}. ${step.description}"
               aria-label="Listen to step: ${step.label}"
             >
@@ -149,23 +149,23 @@ export function renderFinancialTimelineHTML(currentStatus: MilestoneStatus = "li
               </svg>
             </button>
           </div>
-          <p class="text-[10px] text-[#66625A] font-medium line-clamp-1">${step.vernacularLabel}</p>
-          <p class="text-[10px] text-[#66625A] hidden md:block leading-tight">${step.description}</p>
+          <p class="text-[10px] text-[#5C5C57] font-medium line-clamp-1">${step.vernacularLabel}</p>
+          <p class="text-[10px] text-[#5C5C57] hidden md:block leading-tight">${step.description}</p>
         </div>
       </div>
     `;
   }).join("");
 
   return `
-    <div class="w-full bg-white rounded-2xl p-5 sm:p-6 border border-[#DDD3C3] space-y-5">
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#EAE2D5]">
+    <div class="w-full bg-white rounded-2xl p-5 sm:p-6 border border-[#E6E4DD] space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#E6E4DD]">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#89977B]"></span>
-          <h3 class="text-base font-bold text-[#34332F] font-serif">How Your Payment Reaches You</h3>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#B8C77B]"></span>
+          <h3 class="text-base font-bold text-[#292929] font-serif">How Your Payment Reaches You</h3>
         </div>
         <button
           type="button"
-          class="audio-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#F8F5EF] text-[#414A37] border border-[#DDD3C3] hover:bg-[#E9DFD0] transition-colors cursor-pointer"
+          class="audio-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#FAFAF8] text-[#292929] border border-[#E6E4DD] hover:bg-[#DCE5C5] transition-colors cursor-pointer"
           data-audio-text="How your payment reaches you: First your craft is listed, then sold to a buyer, packed, and money goes straight to your bank account."
           aria-label="Listen to payment journey"
         >
@@ -175,10 +175,10 @@ export function renderFinancialTimelineHTML(currentStatus: MilestoneStatus = "li
       </div>
 
       <div class="relative pt-2 pb-1" role="list" aria-label="Payment steps">
-        <div class="absolute top-8 sm:top-9 left-8 right-8 h-1.5 bg-[#E9DFD0] rounded-full z-0"></div>
+        <div class="absolute top-8 sm:top-9 left-8 right-8 h-1.5 bg-[#DCE5C5] rounded-full z-0"></div>
         <div
           id="timeline-progress-bar"
-          class="absolute top-8 sm:top-9 left-8 h-1.5 bg-[#414A37] rounded-full z-0 transition-all duration-500"
+          class="absolute top-8 sm:top-9 left-8 h-1.5 bg-[#B8C77B] rounded-full z-0 transition-all duration-500"
           style="width: calc((100% - 4rem) * ${progressPercent / 100});"
         ></div>
         <div class="flex items-start justify-between relative z-10">
@@ -186,9 +186,9 @@ export function renderFinancialTimelineHTML(currentStatus: MilestoneStatus = "li
         </div>
       </div>
 
-      <div class="p-3.5 rounded-xl bg-[#F8F5EF] border border-[#DDD3C3] flex flex-wrap items-center justify-between gap-2 text-xs text-[#34332F]">
+      <div class="p-3.5 rounded-xl bg-[#FAFAF8] border border-[#E6E4DD] flex flex-wrap items-center justify-between gap-2 text-xs text-[#292929]">
         <span><strong>No Middlemen:</strong> You keep 100% of your fair price via direct UPI or bank transfer.</span>
-        <span class="font-semibold text-[#414A37] bg-[#E9DFD0] px-2.5 py-1 rounded-lg">Direct Payout</span>
+        <span class="font-semibold text-[#292929] bg-[#DCE5C5] px-2.5 py-1 rounded-lg">Direct Payout</span>
       </div>
     </div>
   `;

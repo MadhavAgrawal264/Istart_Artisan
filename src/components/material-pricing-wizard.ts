@@ -29,15 +29,15 @@ export function renderMaterialPricingWizardHTML(): string {
       <!-- Page Header & Sync Pill -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]">Fair Pricing Calculator</h1>
-          <p class="text-xs sm:text-sm text-[#66625A] mt-1">Enter your material cost and hours worked to find a fair selling price.</p>
+          <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#292929]">Fair Pricing Calculator</h1>
+          <p class="text-xs sm:text-sm text-[#5C5C57] mt-1">Enter your material cost and hours worked to find a fair selling price.</p>
         </div>
 
-        <div id="sync-status-banner" class="rounded-xl px-3.5 py-2 bg-[#E9DFD0] border border-[#DDD3C3] flex items-center gap-2.5 text-xs">
-          <span id="sync-status-indicator" class="w-2.5 h-2.5 rounded-full bg-[#414A37] pulse-subtle"></span>
-          <span id="sync-status-text" class="font-semibold text-[#34332F]">Saved & Ready</span>
-          <span id="offline-queue-badge" class="hidden px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#B9674B] text-white">0 Saved</span>
-          <button type="button" id="btn-force-sync" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-[#34332F] border border-[#DDD3C3] cursor-pointer">
+        <div id="sync-status-banner" class="rounded-xl px-3.5 py-2 bg-[#DCE5C5] border border-[#B8C77B] flex items-center gap-2.5 text-xs">
+          <span id="sync-status-indicator" class="w-2.5 h-2.5 rounded-full bg-[#3F4D22] pulse-subtle"></span>
+          <span id="sync-status-text" class="font-semibold text-[#292929]">Saved & Ready</span>
+          <span id="offline-queue-badge" class="hidden px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#EBC5A9] text-[#292929]">0 Saved</span>
+          <button type="button" id="btn-force-sync" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-[#292929] border border-[#E6E4DD] cursor-pointer">
             Sync Now
           </button>
         </div>
@@ -47,15 +47,15 @@ export function renderMaterialPricingWizardHTML(): string {
       <form id="craft-pricing-form" class="grid grid-cols-1 lg:grid-cols-12 gap-6" novalidate>
 
         <!-- Left Column: Simple Everyday Inputs -->
-        <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-7 border border-[#DDD3C3] shadow-xs space-y-5">
-          <div class="flex items-center justify-between pb-3 border-b border-[#EAE2D5]">
+        <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-7 border border-[#E6E4DD] shadow-xs space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-[#E6E4DD]">
             <div>
-              <h2 class="text-lg sm:text-xl font-bold text-[#34332F] font-serif">Your Work & Material Costs</h2>
-              <p class="text-xs text-[#66625A]">Fill in these 4 simple details in everyday numbers</p>
+              <h2 class="text-lg sm:text-xl font-bold text-[#292929] font-serif">Your Work & Material Costs</h2>
+              <p class="text-xs text-[#5C5C57]">Fill in these 4 simple details in everyday numbers</p>
             </div>
             <button
               type="button"
-              class="audio-btn w-9 h-9 rounded-full text-[#414A37] bg-[#E9DFD0] hover:bg-[#DDD3C3] flex items-center justify-center cursor-pointer"
+              class="audio-btn w-9 h-9 rounded-full text-[#292929] bg-[#DCE5C5] hover:bg-[#B8C77B] flex items-center justify-center cursor-pointer"
               data-audio-text="Enter your product name, choose the main material, type how much the material cost, and how many hours you worked."
               aria-label="Listen to instructions"
               title="Listen to instructions"
@@ -67,10 +67,10 @@ export function renderMaterialPricingWizardHTML(): string {
           <!-- Product Name -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label for="product-name-input" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+              <label for="product-name-input" class="text-xs sm:text-sm font-semibold text-[#292929]">
                 1. What did you make?
               </label>
-              <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="product-name-input">
+              <button type="button" class="audio-btn text-xs text-[#3F4D22] hover:underline font-medium cursor-pointer" data-audio-target="product-name-input">
                 🔊 Listen
               </button>
             </div>
@@ -80,7 +80,7 @@ export function renderMaterialPricingWizardHTML(): string {
               name="product_name"
               required
               placeholder="Example: Hand-painted Clay Vase or Wooden Toy"
-              class="w-full p-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-medium text-[#34332F]"
+              class="w-full p-3.5 rounded-xl border border-[#E6E4DD] bg-[#FAFAF8] focus:bg-white focus:ring-2 focus:ring-[#B8C77B] text-sm font-medium text-[#292929]"
             />
           </div>
 
@@ -88,17 +88,17 @@ export function renderMaterialPricingWizardHTML(): string {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label for="material-catalog-select" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                <label for="material-catalog-select" class="text-xs sm:text-sm font-semibold text-[#292929]">
                   2. Main Material Used
                 </label>
-                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-text="Choose the main material you used, such as wood, clay, yarn, silk, or brass.">
+                <button type="button" class="audio-btn text-xs text-[#3F4D22] hover:underline font-medium cursor-pointer" data-audio-text="Choose the main material you used, such as wood, clay, yarn, silk, or brass.">
                   🔊 Listen
                 </button>
               </div>
               <select
                 id="material-catalog-select"
                 name="material_type"
-                class="w-full p-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-semibold text-[#34332F] cursor-pointer"
+                class="w-full p-3.5 rounded-xl border border-[#E6E4DD] bg-[#FAFAF8] focus:bg-white focus:ring-2 focus:ring-[#B8C77B] text-sm font-semibold text-[#292929] cursor-pointer"
               >
                 <option value="Wood">Wood (Teak / Neem / Sheesham)</option>
                 <option value="Clay">Clay (Terracotta / Pottery)</option>
@@ -109,22 +109,22 @@ export function renderMaterialPricingWizardHTML(): string {
                 <option value="Stone">Stone / Marble</option>
                 <option value="Leather">Leather</option>
               </select>
-              <p id="benchmark-hint-text" class="text-[11px] text-[#66625A] mt-1.5">
-                Typical material cost: <span id="benchmark-baseline-badge" class="font-bold text-[#414A37]">₹450</span>
+              <p id="benchmark-hint-text" class="text-[11px] text-[#5C5C57] mt-1.5">
+                Typical material cost: <span id="benchmark-baseline-badge" class="font-bold text-[#3F4D22]">₹450</span>
               </p>
             </div>
 
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label for="material-cost-input" class="text-xs sm:text-sm font-semibold text-[#34332F]" title="How much money you spent buying raw materials">
+                <label for="material-cost-input" class="text-xs sm:text-sm font-semibold text-[#292929]" title="How much money you spent buying raw materials">
                   3. Money Spent on Materials (₹)
                 </label>
-                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="material-cost-input">
+                <button type="button" class="audio-btn text-xs text-[#3F4D22] hover:underline font-medium cursor-pointer" data-audio-target="material-cost-input">
                   🔊 Listen
                 </button>
               </div>
               <div class="relative">
-                <span class="absolute left-3.5 top-3.5 text-[#66625A] font-bold">₹</span>
+                <span class="absolute left-3.5 top-3.5 text-[#5C5C57] font-bold">₹</span>
                 <input
                   type="number"
                   id="material-cost-input"
@@ -133,21 +133,21 @@ export function renderMaterialPricingWizardHTML(): string {
                   step="1"
                   value="450"
                   required
-                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-bold text-[#34332F]"
+                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#E6E4DD] bg-[#FAFAF8] focus:bg-white focus:ring-2 focus:ring-[#B8C77B] text-sm font-bold text-[#292929]"
                 />
               </div>
-              <p class="text-[11px] text-[#66625A] mt-1.5">We gently alert you if this looks much higher or lower than usual.</p>
+              <p class="text-[11px] text-[#5C5C57] mt-1.5">We gently alert you if this looks much higher or lower than usual.</p>
             </div>
           </div>
 
           <!-- Hours & Fair Hourly Pay -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#EAE2D5]">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#E6E4DD]">
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label for="labor-hours-input" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                <label for="labor-hours-input" class="text-xs sm:text-sm font-semibold text-[#292929]">
                   4. Hours Spent Making It
                 </label>
-                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="labor-hours-input">
+                <button type="button" class="audio-btn text-xs text-[#3F4D22] hover:underline font-medium cursor-pointer" data-audio-target="labor-hours-input">
                   🔊 Listen
                 </button>
               </div>
@@ -159,22 +159,22 @@ export function renderMaterialPricingWizardHTML(): string {
                 step="0.5"
                 value="12"
                 required
-                class="w-full p-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-bold text-[#34332F]"
+                class="w-full p-3.5 rounded-xl border border-[#E6E4DD] bg-[#FAFAF8] focus:bg-white focus:ring-2 focus:ring-[#B8C77B] text-sm font-bold text-[#292929]"
               />
-              <p class="text-[11px] text-[#66625A] mt-1.5">Total time from start to finish.</p>
+              <p class="text-[11px] text-[#5C5C57] mt-1.5">Total time from start to finish.</p>
             </div>
 
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label for="hourly-wage-input" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                <label for="hourly-wage-input" class="text-xs sm:text-sm font-semibold text-[#292929]">
                   Fair Pay Per Hour (₹/hr)
                 </label>
-                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="hourly-wage-input">
+                <button type="button" class="audio-btn text-xs text-[#3F4D22] hover:underline font-medium cursor-pointer" data-audio-target="hourly-wage-input">
                   🔊 Listen
                 </button>
               </div>
               <div class="relative">
-                <span class="absolute left-3.5 top-3.5 text-[#66625A] font-bold">₹</span>
+                <span class="absolute left-3.5 top-3.5 text-[#5C5C57] font-bold">₹</span>
                 <input
                   type="number"
                   id="hourly-wage-input"
@@ -183,22 +183,22 @@ export function renderMaterialPricingWizardHTML(): string {
                   step="5"
                   value="90"
                   required
-                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-bold text-[#34332F]"
+                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#E6E4DD] bg-[#FAFAF8] focus:bg-white focus:ring-2 focus:ring-[#B8C77B] text-sm font-bold text-[#292929]"
                 />
               </div>
-              <p class="text-[11px] text-[#414A37] font-medium mt-1.5">Recommended fair minimum: ₹80/hr or more.</p>
+              <p class="text-[11px] text-[#3F4D22] font-medium mt-1.5">Recommended fair minimum: ₹80/hr or more.</p>
             </div>
           </div>
 
           <!-- Submit Button -->
-          <div class="pt-4 border-t border-[#EAE2D5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <span id="offline-safe-text" class="text-xs text-[#66625A]">
+          <div class="pt-4 border-t border-[#E6E4DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span id="offline-safe-text" class="text-xs text-[#5C5C57]">
               Works even with slow internet — saves safely on your device.
             </span>
             <button
               type="submit"
               id="btn-submit-listing"
-              class="min-h-[48px] px-6 py-3 rounded-2xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              class="min-h-[48px] px-6 py-3 rounded-2xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] font-semibold text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Save & Publish Product</span>
               <span>→</span>
@@ -210,18 +210,18 @@ export function renderMaterialPricingWizardHTML(): string {
         <div class="lg:col-span-5 space-y-5">
 
           <!-- Prominent Suggested Selling Price Card -->
-          <div class="rounded-3xl bg-[#E9DFD0] p-6 border border-[#DDD3C3] space-y-4">
+          <div class="rounded-3xl bg-[#EBC5A9] p-6 border border-[#E6E4DD] space-y-4">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="text-xs font-semibold uppercase tracking-wider text-[#414A37]">Suggested Selling Price</span>
-                <div id="final-price-display" class="font-serif text-4xl sm:text-5xl font-bold text-[#34332F] mt-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-[#292929]">Suggested Selling Price</span>
+                <div id="final-price-display" class="font-serif text-4xl sm:text-5xl font-bold text-[#292929] mt-1">
                   ₹1,530
                 </div>
               </div>
               <button
                 type="button"
                 id="btn-tts-final-price"
-                class="audio-btn px-3 py-2 rounded-xl text-xs font-semibold bg-white text-[#414A37] border border-[#DDD3C3] hover:bg-[#F8F5EF] flex items-center gap-1 cursor-pointer"
+                class="audio-btn px-3 py-2 rounded-xl text-xs font-semibold bg-white text-[#292929] border border-[#E6E4DD] hover:bg-[#FAFAF8] flex items-center gap-1 cursor-pointer"
                 data-audio-text="Suggested selling price is 1530 rupees."
                 aria-label="Listen to suggested price"
               >
@@ -231,40 +231,40 @@ export function renderMaterialPricingWizardHTML(): string {
 
             <!-- Simple Plain-Language Breakdown Tiles -->
             <div class="grid grid-cols-3 gap-2.5 text-center">
-              <div class="bg-white rounded-2xl p-3 border border-[#DDD3C3]">
-                <div class="text-[11px] text-[#66625A] font-medium">Materials</div>
-                <div id="formula-mat-display" class="font-serif text-base font-bold text-[#B9674B] mt-0.5">₹450</div>
+              <div class="bg-white rounded-2xl p-3 border border-[#E6E4DD]">
+                <div class="text-[11px] text-[#5C5C57] font-medium">Materials</div>
+                <div id="formula-mat-display" class="font-serif text-base font-bold text-[#292929] mt-0.5">₹450</div>
               </div>
-              <div class="bg-white rounded-2xl p-3 border border-[#DDD3C3]">
-                <div class="text-[11px] text-[#66625A] font-medium">Your Labor</div>
-                <div id="formula-labor-display" class="font-serif text-base font-bold text-[#414A37] mt-0.5">₹1,080</div>
+              <div class="bg-white rounded-2xl p-3 border border-[#E6E4DD]">
+                <div class="text-[11px] text-[#5C5C57] font-medium">Your Labor</div>
+                <div id="formula-labor-display" class="font-serif text-base font-bold text-[#3F4D22] mt-0.5">₹1,080</div>
               </div>
-              <div class="bg-white rounded-2xl p-3 border border-[#DDD3C3]">
-                <div class="text-[11px] text-[#66625A] font-medium">Fair Base</div>
-                <div id="formula-ai-base-display" class="font-serif text-base font-bold text-[#34332F] mt-0.5">₹1,530</div>
+              <div class="bg-white rounded-2xl p-3 border border-[#E6E4DD]">
+                <div class="text-[11px] text-[#5C5C57] font-medium">Fair Base</div>
+                <div id="formula-ai-base-display" class="font-serif text-base font-bold text-[#292929] mt-0.5">₹1,530</div>
               </div>
             </div>
 
-            <div class="text-xs text-[#414A37] flex items-center justify-between pt-1">
+            <div class="text-xs text-[#292929] flex items-center justify-between pt-1">
               <span>Your time calculation:</span>
               <span id="formula-labor-subtext" class="font-semibold">12 hrs × ₹90/hr</span>
             </div>
           </div>
 
           <!-- Optional Advanced Price Adjustment -->
-          <details class="bg-white rounded-2xl p-5 border border-[#DDD3C3] space-y-4">
-            <summary class="flex items-center justify-between cursor-pointer font-serif font-bold text-sm text-[#34332F]">
+          <details class="bg-white rounded-2xl p-5 border border-[#E6E4DD] space-y-4">
+            <summary class="flex items-center justify-between cursor-pointer font-serif font-bold text-sm text-[#292929]">
               <span>Adjust Price & Check Sale Chances (Optional)</span>
-              <svg class="details-chevron w-4 h-4 text-[#66625A] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg class="details-chevron w-4 h-4 text-[#5C5C57] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </summary>
 
-            <div class="pt-4 space-y-4 border-t border-[#EAE2D5]">
+            <div class="pt-4 space-y-4 border-t border-[#E6E4DD]">
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                  <label for="price-override-slider" class="text-xs font-semibold text-[#34332F]">
+                  <label for="price-override-slider" class="text-xs font-semibold text-[#292929]">
                     Adjust Price Up or Down
                   </label>
-                  <span id="slider-percent-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3]">
+                  <span id="slider-percent-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#FAFAF8] text-[#292929] border border-[#E6E4DD]">
                     0% (Recommended)
                   </span>
                 </div>
@@ -276,27 +276,27 @@ export function renderMaterialPricingWizardHTML(): string {
                   max="25"
                   value="0"
                   step="1"
-                  class="w-full h-2 bg-[#E9DFD0] rounded-lg appearance-none cursor-pointer accent-[#B9674B]"
+                  class="w-full h-2 bg-[#DCE5C5] rounded-lg appearance-none cursor-pointer accent-[#B8C77B]"
                   aria-label="Adjust price percentage from minus 25 percent to plus 25 percent"
                 />
-                <div class="flex justify-between text-[11px] text-[#66625A]">
+                <div class="flex justify-between text-[11px] text-[#5C5C57]">
                   <span>-25% (Sell Faster)</span>
                   <span>0% (Fair Price)</span>
                   <span>+25% (Higher Margin)</span>
                 </div>
               </div>
 
-              <div id="likelihood-health-card" class="rounded-xl p-3.5 bg-[#F8F5EF] border border-[#DDD3C3] space-y-2">
+              <div id="likelihood-health-card" class="rounded-xl p-3.5 bg-[#F0EFF5] border border-[#E6E4DD] space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#34332F]">How likely buyers will buy</span>
-                  <span id="likelihood-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#89977B]/20 text-[#414A37]">
+                  <span class="text-xs font-semibold text-[#292929]">How likely buyers will buy</span>
+                  <span id="likelihood-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DCE5C5] text-[#292929]">
                     Balanced (80%)
                   </span>
                 </div>
-                <div class="w-full h-2.5 rounded-full bg-[#E9DFD0] overflow-hidden">
-                  <div id="likelihood-gauge-bar" class="h-full bg-[#414A37] rounded-full transition-all duration-300" style="width: 80%;"></div>
+                <div class="w-full h-2.5 rounded-full bg-white overflow-hidden border border-[#E6E4DD]">
+                  <div id="likelihood-gauge-bar" class="h-full bg-[#B8C77B] rounded-full transition-all duration-300" style="width: 80%;"></div>
                 </div>
-                <p id="likelihood-desc-text" class="text-xs text-[#66625A] leading-snug">
+                <p id="likelihood-desc-text" class="text-xs text-[#5C5C57] leading-snug">
                   Recommended price: fair for you and welcoming for buyers.
                 </p>
               </div>
@@ -304,10 +304,10 @@ export function renderMaterialPricingWizardHTML(): string {
           </details>
 
           <!-- Optional Payment Journey Timeline -->
-          <details class="bg-white rounded-2xl p-5 border border-[#DDD3C3]">
-            <summary class="flex items-center justify-between cursor-pointer font-serif font-bold text-sm text-[#34332F]">
+          <details class="bg-white rounded-2xl p-5 border border-[#E6E4DD]">
+            <summary class="flex items-center justify-between cursor-pointer font-serif font-bold text-sm text-[#292929]">
               <span>View Payment Steps (Optional)</span>
-              <svg class="details-chevron w-4 h-4 text-[#66625A] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg class="details-chevron w-4 h-4 text-[#5C5C57] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </summary>
             <div id="milestone-timeline-container" class="pt-4">
               ${defaultTimelineHTML}
@@ -320,24 +320,24 @@ export function renderMaterialPricingWizardHTML(): string {
       <!-- Material Cost Deviation Warning Modal -->
       <div
         id="cost-deviation-modal"
-        class="hidden fixed inset-0 z-50 bg-[#34332F]/60 backdrop-blur-xs flex items-center justify-center p-4"
+        class="hidden fixed inset-0 z-50 bg-[#292929]/55 backdrop-blur-xs flex items-center justify-center p-4"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="modal-deviation-title"
         aria-describedby="modal-deviation-desc"
         aria-hidden="true"
       >
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-[#DDD3C3] space-y-5 text-left">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-[#E6E4DD] space-y-5 text-left">
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-[#E9DFD0] flex items-center justify-center text-xl flex-shrink-0">
+              <div class="w-11 h-11 rounded-xl bg-[#EBC5A9] flex items-center justify-center text-xl flex-shrink-0">
                 ⚠️
               </div>
               <div>
-                <h3 id="modal-deviation-title" data-modal-title class="text-base font-bold text-[#34332F] font-serif">
+                <h3 id="modal-deviation-title" data-modal-title class="text-base font-bold text-[#292929] font-serif">
                   Check Material Cost
                 </h3>
-                <span data-modal-badge class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#E9DFD0] text-[#B9674B]">
+                <span data-modal-badge class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#EBC5A9] text-[#292929]">
                   Higher than usual
                 </span>
               </div>
@@ -345,7 +345,7 @@ export function renderMaterialPricingWizardHTML(): string {
 
             <button
               type="button"
-              class="audio-btn p-1.5 rounded-full text-[#66625A] hover:text-[#34332F] hover:bg-[#F8F5EF] cursor-pointer"
+              class="audio-btn p-1.5 rounded-full text-[#5C5C57] hover:text-[#292929] hover:bg-[#FAFAF8] cursor-pointer"
               data-audio-text="Please check your material cost. The amount you entered is quite different from the usual rate."
               aria-label="Listen to warning"
             >
@@ -353,26 +353,26 @@ export function renderMaterialPricingWizardHTML(): string {
             </button>
           </div>
 
-          <p id="modal-deviation-desc" data-modal-desc class="text-xs sm:text-sm text-[#66625A] leading-relaxed">
+          <p id="modal-deviation-desc" data-modal-desc class="text-xs sm:text-sm text-[#5C5C57] leading-relaxed">
             The material cost you entered looks different from the typical rate. You can keep your number or use the typical rate.
           </p>
 
-          <div class="p-3.5 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] grid grid-cols-2 gap-3 text-center text-xs">
+          <div class="p-3.5 rounded-2xl bg-[#FAFAF8] border border-[#E6E4DD] grid grid-cols-2 gap-3 text-center text-xs">
             <div>
-              <span class="text-[11px] text-[#66625A] font-medium">Usual Rate</span>
-              <div data-modal-baseline class="text-base font-bold text-[#34332F]">₹450</div>
+              <span class="text-[11px] text-[#5C5C57] font-medium">Usual Rate</span>
+              <div data-modal-baseline class="text-base font-bold text-[#292929]">₹450</div>
             </div>
             <div>
-              <span class="text-[11px] text-[#66625A] font-medium">You Entered</span>
-              <div data-modal-entered class="text-base font-bold text-[#B9674B]">₹680</div>
+              <span class="text-[11px] text-[#5C5C57] font-medium">You Entered</span>
+              <div data-modal-entered class="text-base font-bold text-[#292929]">₹680</div>
             </div>
           </div>
 
           <div class="flex flex-col sm:flex-row gap-3 pt-1">
-            <button type="button" id="modal-btn-adjust" data-modal-cancel class="flex-1 py-3 px-4 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] font-semibold text-xs border border-[#DDD3C3] cursor-pointer">
+            <button type="button" id="modal-btn-adjust" data-modal-cancel class="flex-1 py-3 px-4 rounded-xl bg-[#FAFAF8] hover:bg-[#DCE5C5] text-[#292929] font-semibold text-xs border border-[#E6E4DD] cursor-pointer">
               Use Usual Rate
             </button>
-            <button type="button" id="modal-btn-override" data-modal-confirm class="flex-1 py-3 px-4 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white font-semibold text-xs cursor-pointer">
+            <button type="button" id="modal-btn-override" data-modal-confirm class="flex-1 py-3 px-4 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] font-semibold text-xs cursor-pointer">
               Keep My Amount
             </button>
           </div>
@@ -602,10 +602,10 @@ export class MaterialPricingWizardController {
         ? "0% (Recommended)"
         : `${sign}${breakdown.overridePercent}% Adjusted`;
       sliderBadge.className = breakdown.overridePercent > 0
-        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E9DFD0] text-[#B9674B] border border-[#DDD3C3]"
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EBC5A9] text-[#292929] border border-[#E6E4DD]"
         : breakdown.overridePercent < 0
-        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#89977B]/20 text-[#414A37] border border-[#89977B]/40"
-        : "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3]";
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#DCE5C5] text-[#292929] border border-[#B8C77B]"
+        : "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#FAFAF8] text-[#292929] border border-[#E6E4DD]";
     }
 
     if (ttsFinalBtn) {
@@ -624,19 +624,19 @@ export class MaterialPricingWizardController {
     if (likelihoodBadge) {
       likelihoodBadge.textContent = `${likelihood.state} (${likelihood.scorePercent}%)`;
       likelihoodBadge.className = likelihood.state === "High"
-        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#89977B]/25 text-[#414A37]"
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#DCE5C5] text-[#292929]"
         : likelihood.state === "Balanced"
-        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E9DFD0] text-[#414A37]"
-        : "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#B9674B]/15 text-[#B9674B]";
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#B8C77B] text-[#292929]"
+        : "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EBC5A9] text-[#292929]";
     }
 
     if (likelihoodBar) {
       likelihoodBar.style.width = `${likelihood.scorePercent}%`;
       likelihoodBar.className = likelihood.state === "High"
-        ? "h-full bg-[#89977B] rounded-full transition-all duration-300"
+        ? "h-full bg-[#B8C77B] rounded-full transition-all duration-300"
         : likelihood.state === "Balanced"
-        ? "h-full bg-[#414A37] rounded-full transition-all duration-300"
-        : "h-full bg-[#B9674B] rounded-full transition-all duration-300";
+        ? "h-full bg-[#3F4D22] rounded-full transition-all duration-300"
+        : "h-full bg-[#EBC5A9] rounded-full transition-all duration-300";
     }
 
     if (likelihoodDesc) {
@@ -738,15 +738,15 @@ export class MaterialPricingWizardController {
     if (!banner || !indicator || !text) return;
 
     if (isOnline) {
-      indicator.className = "w-2.5 h-2.5 rounded-full bg-[#414A37] pulse-subtle";
+      indicator.className = "w-2.5 h-2.5 rounded-full bg-[#3F4D22] pulse-subtle";
       text.textContent = queuedCount > 0
         ? `Online • Syncing ${queuedCount} saved item(s)...`
         : "Saved & Ready";
-      banner.className = "rounded-xl px-3.5 py-2 bg-[#E9DFD0] border border-[#DDD3C3] flex items-center gap-2.5 text-xs";
+      banner.className = "rounded-xl px-3.5 py-2 bg-[#DCE5C5] border border-[#B8C77B] flex items-center gap-2.5 text-xs";
     } else {
-      indicator.className = "w-2.5 h-2.5 rounded-full bg-[#B9674B] animate-pulse";
+      indicator.className = "w-2.5 h-2.5 rounded-full bg-[#292929] animate-pulse";
       text.textContent = "Offline • Saving safely on device";
-      banner.className = "rounded-xl px-3.5 py-2 bg-[#F8F5EF] border border-[#B9674B]/50 flex items-center gap-2.5 text-xs";
+      banner.className = "rounded-xl px-3.5 py-2 bg-[#EBC5A9] border border-[#E6E4DD] flex items-center gap-2.5 text-xs";
     }
 
     if (badge) {

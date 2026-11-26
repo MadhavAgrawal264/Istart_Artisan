@@ -7,28 +7,41 @@ import { TRANSLATIONS, SUPPORTED_LANGUAGES } from "./translations.js";
 import { INITIAL_PRODUCTS, INITIAL_ARTISANS, CRAFT_CATEGORIES, INDIAN_STATES } from "./catalog-data.js";
 import { applyStudioEnhancement, generateMarketStallCard } from "./canvas-tools.js";
 import { MaterialPricingWizardController } from "./components/material-pricing-wizard.ts";
+import { authService, getDashboardRouteForRole } from "./services/auth.ts";
+import { parseCurrentLocation, navigateTo } from "./router.ts";
+import { scrollChoreographer } from "./services/scrollytelling.ts";
 
 
 // ==============================================================================
 // APP STATE
 // ==============================================================================
 const state = {
-  currentLang: "hi", // Default to Hindi for Indian artisan accessibility
+  currentLang: "en",
   activeTab: "home",
-  userRole: "artisan", // 'artisan' | 'buyer'
+  userRole: "artisan",
+  authUser: null,
+  currentRoute: null,
   isHighContrast: false,
   isLargeFont: false,
   products: [...INITIAL_PRODUCTS],
   artisans: [...INITIAL_ARTISANS],
   inquiries: [],
   currentArtisan: INITIAL_ARTISANS[0],
-  
-  // Active catalog filters
+
+  // Dashboard catalog filters
   searchQuery: "",
   selectedCategory: "All Categories",
   selectedState: "All States",
   selectedStatus: "all",
   maxPrice: 10000,
+
+  // Public explore filters
+  publicFilters: {
+    search: "",
+    category: "All Categories",
+    state: "All States",
+    maxPrice: 10000,
+  },
   
   // Active Cataloging Wizard Draft
   draft: {
@@ -70,25 +83,15 @@ export function showToast(message, type = "info", duration = 3500) {
     return;
   }
   const toast = document.createElement("div");
-  toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl border text-xs sm:text-sm font-semibold transition-all transform translate-y-3 opacity-0 ${
-    type === "error"
-      ? "bg-rose-950 text-rose-100 border-rose-800"
-      : type === "success"
-      ? "bg-emerald-950 text-emerald-100 border-emerald-800"
-      : type === "warning"
-      ? "bg-amber-950 text-amber-100 border-amber-800"
-      : "bg-stone-900 text-white border-stone-700"
-  }`;
-  
   const icon = type === "error" ? "⚠️" : type === "success" ? "✅" : type === "warning" ? "🔔" : "✨";
   toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border text-xs sm:text-sm font-semibold transition-all transform translate-y-3 opacity-0 ${
     type === "error"
-      ? "bg-[#B9674B] text-white border-[#A3553A]"
+      ? "bg-[#EBC5A9] text-[#292929] border-[#292929]/20"
       : type === "success"
-      ? "bg-[#414A37] text-[#F8F5EF] border-[#32392A]"
+      ? "bg-[#B8C77B] text-[#292929] border-[#a6b668]"
       : type === "warning"
-      ? "bg-[#E9DFD0] text-[#34332F] border-[#B9674B]"
-      : "bg-[#34332F] text-[#F8F5EF] border-[#414A37]"
+      ? "bg-[#DCE5C5] text-[#292929] border-[#B8C77B]"
+      : "bg-white text-[#292929] border-[#E6E4DD]"
   }`;
   toast.innerHTML = `<span class="text-base">${icon}</span><span class="flex-1">${message}</span>`;
   container.appendChild(toast);
@@ -143,7 +146,7 @@ function saveLocalInquiries() {
 // ==============================================================================
 // INITIALIZATION
 // ==============================================================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   loadLocalOverrides();
   initSpeechRecognition();
   setupLanguageSelector();
@@ -159,12 +162,29 @@ document.addEventListener("DOMContentLoaded", () => {
   setupInquiryModal();
   setupAudioTTS();
 
+  // Public site & authentication setup
+  setupPublicRouter();
+  setupPublicExploreFilters();
+  setupPublicInteractions();
+  setupAuthForms();
+  setupInfoModal();
+
   window.addEventListener("artisan-toast", (e) => {
     const detail = e.detail || {};
     if (detail.message) {
       showToast(detail.message, detail.type || "info");
     }
   });
+
+  // Restore real authenticated session before evaluating protected routes
+  state.authUser = await authService.getCurrentUser();
+  syncPublicAuthHeader();
+
+  // Apply route immediately (defaults to public homepage '/')
+  applyRoute(parseCurrentLocation());
+
+  // Initialize Corn Revolution-inspired scrollytelling & particle choreography
+  scrollChoreographer.init();
 
   // Fetch products and inquiries from API
   fetchProducts();
@@ -182,6 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Apply initial translations and render views
   applyTranslations();
+  renderHomeFeaturedProducts();
+  renderPublicExplore();
   renderDashboard();
   renderCatalog();
   renderArtisanStudio();
@@ -359,11 +381,11 @@ function switchTab(tabName) {
     btn.classList.toggle("is-active", isCurrent);
     if (!btn.classList.contains("mobile-nav-btn")) {
       if (isCurrent) {
-        btn.classList.add("text-[#414A37]", "font-bold");
-        btn.classList.remove("text-[#66625A]");
+        btn.classList.add("text-[#292929]", "font-bold");
+        btn.classList.remove("text-[#5C5C57]");
       } else {
-        btn.classList.remove("text-[#414A37]", "font-bold");
-        btn.classList.add("text-[#66625A]");
+        btn.classList.remove("text-[#292929]", "font-bold");
+        btn.classList.add("text-[#5C5C57]");
       }
     }
   });
@@ -383,10 +405,607 @@ function switchTab(tabName) {
   }
 }
 
+// ==============================================================================
+// 2B. PUBLIC WEBSITE ROUTING, PAGES & AUTHENTICATION GUARDS
+// ==============================================================================
+const PUBLIC_CATEGORY_GROUPS = {
+  "Pottery": ["pottery", "ceramics & pottery", "terracotta & clay art"],
+  "Textiles": ["textiles", "handloom & textiles"],
+  "Woodwork": ["woodwork", "wooden toys & carvings"],
+  "Bamboo and Cane": ["bamboo and cane", "bamboo & cane"],
+  "Jewellery": ["jewellery", "jewelry & filigree", "metalcraft & bell metal"],
+  "Folk Art": ["folk art", "paintings & folk art"]
+};
+
+function matchesCategoryFilter(productCategory, selectedCategory) {
+  if (!selectedCategory || selectedCategory === "All Categories") return true;
+  const prodCat = String(productCategory || "").toLowerCase();
+  const group = PUBLIC_CATEGORY_GROUPS[selectedCategory];
+  if (group) {
+    return group.some(g => prodCat === g || prodCat.includes(g));
+  }
+  return prodCat === selectedCategory.toLowerCase();
+}
+
+function setupPublicRouter() {
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[data-route]");
+    if (!link) return;
+    const targetRoute = link.getAttribute("data-route");
+    if (!targetRoute) return;
+    e.preventDefault();
+    document.getElementById("public-mobile-menu")?.classList.add("hidden");
+    navigateAndRender(targetRoute);
+  });
+
+  window.addEventListener("popstate", () => {
+    applyRoute(parseCurrentLocation());
+  });
+}
+
+function navigateAndRender(appPath, replace = false) {
+  const route = navigateTo(appPath, replace);
+  applyRoute(route);
+}
+
+function syncPublicAuthHeader() {
+  const guestDesktop = document.getElementById("public-auth-guest");
+  const userDesktop = document.getElementById("public-auth-user");
+  const dashLinkDesktop = document.getElementById("public-user-dashboard-link");
+  const guestMobile = document.getElementById("public-mobile-auth-guest");
+  const userMobile = document.getElementById("public-mobile-auth-user");
+  const dashLinkMobile = document.getElementById("public-mobile-dashboard-link");
+
+  const isLoggedIn = Boolean(state.authUser);
+  const dashPath = getDashboardRouteForRole(state.authUser?.accountType);
+
+  if (guestDesktop) guestDesktop.classList.toggle("hidden", isLoggedIn);
+  if (userDesktop) {
+    userDesktop.classList.toggle("hidden", !isLoggedIn);
+    userDesktop.classList.toggle("flex", isLoggedIn);
+  }
+  if (dashLinkDesktop) {
+    dashLinkDesktop.setAttribute("href", dashPath);
+    dashLinkDesktop.setAttribute("data-route", dashPath);
+    dashLinkDesktop.textContent = state.authUser?.accountType === "artisan" ? "Artisan Studio" : "My Dashboard";
+  }
+
+  if (guestMobile) guestMobile.classList.toggle("hidden", isLoggedIn);
+  if (userMobile) {
+    userMobile.classList.toggle("hidden", !isLoggedIn);
+    userMobile.classList.toggle("flex", isLoggedIn);
+  }
+  if (dashLinkMobile) {
+    dashLinkMobile.setAttribute("href", dashPath);
+    dashLinkMobile.setAttribute("data-route", dashPath);
+  }
+}
+
+function applyRoute(route) {
+  state.currentRoute = route;
+  const publicShell = document.getElementById("public-site-shell");
+  const artisanShell = document.getElementById("artisan-dashboard-shell");
+
+  // Protected: /artisan/dashboard
+  if (route.name === "artisan-dashboard") {
+    if (!state.authUser) {
+      showToast("Please login with an Artisan account to open your dashboard.", "warning");
+      navigateAndRender("/login", true);
+      return;
+    }
+    if (state.authUser.accountType === "buyer") {
+      navigateAndRender("/buyer/dashboard", true);
+      return;
+    }
+
+    publicShell?.classList.add("hidden");
+    artisanShell?.classList.remove("hidden");
+    if (state.authUser.fullName) {
+      state.currentArtisan = { ...state.currentArtisan, fullName: state.authUser.fullName };
+    }
+    renderDashboard();
+    renderCatalog();
+    renderArtisanStudio();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  // Protected: /buyer/dashboard
+  if (route.name === "buyer-dashboard") {
+    if (!state.authUser) {
+      showToast("Please login to access your dashboard.", "warning");
+      navigateAndRender("/login", true);
+      return;
+    }
+    if (state.authUser.accountType === "artisan" || state.authUser.accountType === "organization") {
+      navigateAndRender("/artisan/dashboard", true);
+      return;
+    }
+  }
+
+  // Public shell routes
+  artisanShell?.classList.add("hidden");
+  publicShell?.classList.remove("hidden");
+
+  document.querySelectorAll(".public-page").forEach(page => page.classList.add("hidden"));
+  const pageEl = document.getElementById(`public-page-${route.name}`);
+  if (pageEl) pageEl.classList.remove("hidden");
+
+  document.querySelectorAll(".public-nav-link").forEach(link => {
+    const linkRoute = link.getAttribute("data-route");
+    const active =
+      (route.name === "home" && linkRoute === "/") ||
+      (route.name === "explore" && linkRoute === "/explore") ||
+      (route.name === "about" && linkRoute === "/about") ||
+      (route.name === "contact" && linkRoute === "/contact");
+    link.classList.toggle("is-active", active);
+  });
+
+  if (route.name === "home") {
+    renderHomeFeaturedProducts();
+  } else if (route.name === "explore") {
+    const catParam = route.query?.get("category");
+    if (catParam) {
+      state.publicFilters.category = catParam;
+      const catEl = document.getElementById("public-explore-category");
+      if (catEl) catEl.value = catParam;
+    }
+    renderPublicExplore();
+  } else if (route.name === "product") {
+    renderPublicProductDetail(route.params.id);
+  } else if (route.name === "register") {
+    const typeParam = route.query?.get("type");
+    const regSelect = document.getElementById("reg-account-type");
+    if (regSelect && (typeParam === "artisan" || typeParam === "buyer")) {
+      regSelect.value = typeParam;
+    }
+  } else if (route.name === "buyer-dashboard") {
+    renderBuyerDashboard();
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderHomeFeaturedProducts() {
+  const container = document.getElementById("home-featured-products");
+  if (!container) return;
+
+  const published = state.products.filter(p => p.isApprovedByArtisan !== false).slice(0, 4);
+  if (published.length === 0) {
+    container.innerHTML = `<div class="col-span-full p-8 text-center bg-white rounded-2xl border border-[#E6E4DD] text-sm text-[#5C5C57]">No featured products available yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = published.map(p => {
+    const artisan = state.artisans.find(a => a.id === p.artisanId) || state.currentArtisan;
+    return `
+      <div class="craft-card rounded-2xl overflow-hidden flex flex-col">
+        <div class="aspect-[4/3] bg-[#F0EFF5] overflow-hidden">
+          <img src="${p.enhancedImageUrl || p.imageUrl}" alt="${escapeHtml(p.title)}" loading="lazy" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+          <div>
+            <h3 class="font-serif font-bold text-[#292929] text-base leading-snug line-clamp-2">${escapeHtml(p.title)}</h3>
+            <p class="text-xs text-[#5C5C57] mt-1">${escapeHtml(artisan.fullName)} • ${escapeHtml(p.originState || artisan.state || "India")}</p>
+          </div>
+          <div class="pt-3 border-t border-[#E6E4DD] flex items-center justify-between gap-2">
+            <span class="font-serif font-bold text-lg text-[#292929]">₹${Number(p.finalPrice).toLocaleString("en-IN")}</span>
+            <a href="/product/${encodeURIComponent(p.id)}" data-route="/product/${encodeURIComponent(p.id)}" class="px-4 py-2 rounded-xl bg-[#DCE5C5] hover:bg-[#B8C77B] text-[#292929] text-xs font-semibold transition-colors">
+              View Product
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function setupPublicExploreFilters() {
+  const searchEl = document.getElementById("public-explore-search");
+  const catEl = document.getElementById("public-explore-category");
+  const stateEl = document.getElementById("public-explore-state");
+  const priceEl = document.getElementById("public-explore-price");
+  const priceValEl = document.getElementById("public-explore-price-val");
+
+  if (catEl) {
+    catEl.innerHTML = CRAFT_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join("");
+    catEl.addEventListener("change", (e) => {
+      state.publicFilters.category = e.target.value;
+      renderPublicExplore();
+    });
+  }
+
+  if (stateEl) {
+    stateEl.innerHTML = INDIAN_STATES.map(s => `<option value="${s}">${s}</option>`).join("");
+    stateEl.addEventListener("change", (e) => {
+      state.publicFilters.state = e.target.value;
+      renderPublicExplore();
+    });
+  }
+
+  if (searchEl) {
+    searchEl.addEventListener("input", (e) => {
+      state.publicFilters.search = e.target.value;
+      renderPublicExplore();
+    });
+  }
+
+  if (priceEl) {
+    priceEl.addEventListener("input", (e) => {
+      state.publicFilters.maxPrice = Number(e.target.value);
+      if (priceValEl) priceValEl.textContent = `₹${state.publicFilters.maxPrice.toLocaleString("en-IN")}`;
+      renderPublicExplore();
+    });
+  }
+}
+
+function renderPublicExplore() {
+  const grid = document.getElementById("public-explore-grid");
+  const countEl = document.getElementById("public-explore-count");
+  if (!grid) return;
+
+  const q = state.publicFilters.search.toLowerCase().trim();
+  const filtered = state.products.filter(p => {
+    if (p.isApprovedByArtisan === false) return false;
+    const okCat = matchesCategoryFilter(p.category, state.publicFilters.category);
+    const okState = state.publicFilters.state === "All States" || (p.originState && p.originState.toLowerCase() === state.publicFilters.state.toLowerCase());
+    const okPrice = Number(p.finalPrice) <= state.publicFilters.maxPrice;
+    const okSearch = !q ||
+      p.title.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      (p.originState && p.originState.toLowerCase().includes(q)) ||
+      (p.description && p.description.toLowerCase().includes(q));
+    return okCat && okState && okPrice && okSearch;
+  });
+
+  if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? "Product" : "Products"}`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full py-14 px-6 bg-white rounded-3xl border border-[#E6E4DD] text-center space-y-3">
+        <p class="font-serif text-lg font-bold text-[#292929]">No crafts found matching your filters</p>
+        <p class="text-xs sm:text-sm text-[#5C5C57]">Try clearing your search or viewing all categories.</p>
+        <button type="button" id="public-reset-explore-btn" class="px-5 py-2.5 rounded-xl bg-[#B8C77B] text-[#292929] text-xs font-semibold cursor-pointer">Show All Crafts</button>
+      </div>
+    `;
+    document.getElementById("public-reset-explore-btn")?.addEventListener("click", () => {
+      state.publicFilters = { search: "", category: "All Categories", state: "All States", maxPrice: 10000 };
+      const s = document.getElementById("public-explore-search");
+      const c = document.getElementById("public-explore-category");
+      const st = document.getElementById("public-explore-state");
+      const pr = document.getElementById("public-explore-price");
+      const pv = document.getElementById("public-explore-price-val");
+      if (s) s.value = "";
+      if (c) c.value = "All Categories";
+      if (st) st.value = "All States";
+      if (pr) pr.value = "10000";
+      if (pv) pv.textContent = "₹10,000";
+      renderPublicExplore();
+    });
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => {
+    const artisan = state.artisans.find(a => a.id === p.artisanId) || state.currentArtisan;
+    return `
+      <div class="craft-card rounded-2xl overflow-hidden flex flex-col">
+        <div class="relative aspect-[4/3] bg-[#F0EFF5] overflow-hidden">
+          <img src="${p.enhancedImageUrl || p.imageUrl}" alt="${escapeHtml(p.title)}" loading="lazy" class="w-full h-full object-cover" />
+          <span class="absolute bottom-3 right-3 bg-white/95 text-[#292929] text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-[#E6E4DD]">
+            ${escapeHtml(p.originState || "India")}
+          </span>
+        </div>
+        <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+          <div>
+            <div class="text-[11px] font-semibold text-[#3F4D22] uppercase tracking-wide">${escapeHtml(p.category)}</div>
+            <h3 class="font-serif font-bold text-[#292929] text-base leading-snug line-clamp-2 mt-1">${escapeHtml(p.title)}</h3>
+            <p class="text-xs text-[#5C5C57] mt-1">${escapeHtml(artisan.fullName)}</p>
+          </div>
+          <div class="pt-3 border-t border-[#E6E4DD] flex items-center justify-between gap-2">
+            <span class="font-serif font-bold text-lg text-[#292929]">₹${Number(p.finalPrice).toLocaleString("en-IN")}</span>
+            <a href="/product/${encodeURIComponent(p.id)}" data-route="/product/${encodeURIComponent(p.id)}" class="px-4 py-2 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] text-xs font-semibold transition-colors">
+              View Product
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderPublicProductDetail(productId) {
+  const container = document.getElementById("public-product-detail-container");
+  if (!container) return;
+
+  const product = state.products.find(p => p.id === productId);
+  if (!product) {
+    container.innerHTML = `
+      <div class="text-center py-12 space-y-3">
+        <h2 class="font-serif text-2xl font-bold text-[#292929]">Craft Not Found</h2>
+        <p class="text-sm text-[#5C5C57]">This craft listing may have moved or been removed.</p>
+        <a href="/explore" data-route="/explore" class="inline-block px-5 py-2.5 rounded-xl bg-[#B8C77B] text-[#292929] text-sm font-semibold">Explore All Crafts</a>
+      </div>
+    `;
+    return;
+  }
+
+  const artisan = state.artisans.find(a => a.id === product.artisanId) || state.currentArtisan;
+  const mats = Array.isArray(product.materials) ? product.materials.join(", ") : (product.materials || "Natural Materials");
+  const rawPhone = (artisan.phone || "").replace(/\D/g, "");
+  const waText = encodeURIComponent(`Namaste ${artisan.fullName}! I saw "${product.title}" on ARTISAN (₹${product.finalPrice}) and would like to know more.`);
+
+  container.innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-6 space-y-4">
+        <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-[#F0EFF5] border border-[#E6E4DD]">
+          <img src="${product.enhancedImageUrl || product.imageUrl}" alt="${escapeHtml(product.title)}" class="w-full h-full object-cover" />
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 space-y-5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="px-3 py-1 rounded-full bg-[#DCE5C5] text-[#292929] text-xs font-semibold">${escapeHtml(product.category)}</span>
+          ${product.hasGiTag ? `<span class="px-3 py-1 rounded-full bg-[#EBC5A9] text-[#292929] text-xs font-semibold">GI Heritage</span>` : ""}
+        </div>
+
+        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#292929] leading-snug">${escapeHtml(product.title)}</h1>
+
+        <div class="flex items-baseline gap-3">
+          <span class="font-serif text-3xl font-bold text-[#292929]">₹${Number(product.finalPrice).toLocaleString("en-IN")}</span>
+          ${product.marketBenchmarkPrice ? `<span class="text-sm text-[#5C5C57] line-through">₹${Number(product.marketBenchmarkPrice).toLocaleString("en-IN")}</span>` : ""}
+        </div>
+
+        <p class="text-sm text-[#5C5C57] leading-relaxed">${escapeHtml(product.description)}</p>
+
+        <div class="p-4 rounded-2xl bg-[#FAFAF8] border border-[#E6E4DD] space-y-1.5">
+          <div class="text-xs font-semibold text-[#3F4D22] uppercase">Craft Story</div>
+          <p class="text-xs sm:text-sm text-[#292929] italic leading-relaxed">${escapeHtml(product.culturalStory || "Handcrafted with generational skill and care.")}</p>
+        </div>
+
+        <div class="text-xs text-[#5C5C57] space-y-1">
+          <div><strong class="text-[#292929]">Materials:</strong> ${escapeHtml(mats)}</div>
+          <div><strong class="text-[#292929]">Origin:</strong> ${escapeHtml(product.originState || artisan.state || "India")}</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#DCE5C5]/60 border border-[#B8C77B]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img src="${artisan.profileImage || "./assets/sitadevi_profile.jpg"}" alt="${escapeHtml(artisan.fullName)}" class="w-12 h-12 rounded-xl object-cover border border-[#B8C77B]" />
+            <div>
+              <div class="font-serif font-bold text-sm text-[#292929]">${escapeHtml(artisan.fullName)}</div>
+              <div class="text-xs text-[#5C5C57]">${escapeHtml(artisan.districtVillage || artisan.state || "India")}</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a href="https://wa.me/${rawPhone || "919876543210"}?text=${waText}" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl bg-white border border-[#E6E4DD] text-xs font-semibold text-[#292929]">WhatsApp</a>
+            <button type="button" id="public-detail-enquiry-btn" class="px-5 py-2.5 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-xs font-semibold text-[#292929] cursor-pointer">Send Enquiry</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("public-detail-enquiry-btn")?.addEventListener("click", () => {
+    openInquiryModal(product);
+  });
+}
+
+function renderBuyerDashboard() {
+  const nameEl = document.getElementById("buyer-dash-name");
+  const metaEl = document.getElementById("buyer-dash-meta");
+  const listEl = document.getElementById("buyer-dash-enquiries");
+
+  if (nameEl) nameEl.textContent = state.authUser?.fullName || "Buyer";
+  if (metaEl) metaEl.textContent = `${state.authUser?.email || ""} ${state.authUser?.mobileNumber ? "• " + state.authUser.mobileNumber : ""}`;
+
+  if (listEl) {
+    if (state.inquiries.length === 0) {
+      listEl.innerHTML = `<p class="text-sm text-[#5C5C57]">You have not sent any craft enquiries yet. Explore handmade crafts to connect directly with artisans.</p>`;
+    } else {
+      listEl.innerHTML = state.inquiries.slice(0, 5).map(inq => {
+        const prod = state.products.find(p => p.id === inq.productId) || { title: "Handmade Craft" };
+        return `
+          <div class="p-4 rounded-2xl bg-[#FAFAF8] border border-[#E6E4DD] flex items-center justify-between gap-3">
+            <div>
+              <div class="font-semibold text-[#292929]">${escapeHtml(prod.title)}</div>
+              <div class="text-xs text-[#5C5C57]">Quantity: ${inq.quantity || 1} • ${escapeHtml(inq.message || "Enquiry sent")}</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-[#DCE5C5] text-xs font-semibold text-[#292929]">Sent</span>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+}
+
+function setupPublicInteractions() {
+  const mobileBtn = document.getElementById("public-mobile-menu-btn");
+  const mobileMenu = document.getElementById("public-mobile-menu");
+  mobileBtn?.addEventListener("click", () => {
+    mobileMenu?.classList.toggle("hidden");
+  });
+
+  const handleLogout = async () => {
+    await authService.logout();
+    state.authUser = null;
+    syncPublicAuthHeader();
+    showToast("You have been logged out.", "info");
+    navigateAndRender("/");
+  };
+
+  document.getElementById("public-btn-logout")?.addEventListener("click", handleLogout);
+  document.getElementById("public-mobile-btn-logout")?.addEventListener("click", handleLogout);
+  document.getElementById("buyer-btn-logout")?.addEventListener("click", handleLogout);
+  document.getElementById("dashboard-btn-logout")?.addEventListener("click", handleLogout);
+
+  // Contact Us Form
+  const contactForm = document.getElementById("public-contact-form");
+  contactForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("contact-name")?.value.trim();
+    const email = document.getElementById("contact-email")?.value.trim();
+    const subject = document.getElementById("contact-subject")?.value.trim();
+    const message = document.getElementById("contact-message")?.value.trim();
+    const feedback = document.getElementById("contact-feedback");
+    const submitBtn = document.getElementById("contact-submit-btn");
+
+    if (!name || !email || !message) return;
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message })
+      });
+      if (!res.ok) throw new Error("Server unreachable");
+      if (feedback) {
+        feedback.textContent = "Thank you! Your message has been received by our team.";
+        feedback.className = "text-xs font-medium p-3 rounded-xl bg-[#DCE5C5] text-[#292929]";
+      }
+      contactForm.reset();
+    } catch {
+      if (feedback) {
+        feedback.textContent = "We could not submit online right now. Please email support@artisan-crafts.example directly.";
+        feedback.className = "text-xs font-medium p-3 rounded-xl bg-[#EBC5A9] text-[#292929]";
+      }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+}
+
+function setupAuthForms() {
+  const loginForm = document.getElementById("login-form");
+  loginForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email")?.value || "";
+    const password = document.getElementById("login-password")?.value || "";
+    const errBox = document.getElementById("login-error-box");
+    const btn = document.getElementById("login-submit-btn");
+
+    errBox?.classList.add("hidden");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Signing in...";
+    }
+
+    const result = await authService.login(email, password);
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Sign In";
+    }
+
+    if (!result.success || !result.user) {
+      if (errBox) {
+        errBox.textContent = result.error || "Invalid email or password.";
+        errBox.classList.remove("hidden");
+      }
+      return;
+    }
+
+    state.authUser = result.user;
+    syncPublicAuthHeader();
+    showToast(`Welcome back, ${result.user.fullName}!`, "success");
+    loginForm.reset();
+    navigateAndRender(getDashboardRouteForRole(result.user.accountType));
+  });
+
+  const regForm = document.getElementById("register-form");
+  regForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fullName = document.getElementById("reg-full-name")?.value || "";
+    const email = document.getElementById("reg-email")?.value || "";
+    const mobileNumber = document.getElementById("reg-mobile")?.value || "";
+    const accountType = document.getElementById("reg-account-type")?.value || "buyer";
+    const password = document.getElementById("reg-password")?.value || "";
+    const errBox = document.getElementById("register-error-box");
+    const okBox = document.getElementById("register-success-box");
+    const btn = document.getElementById("register-submit-btn");
+
+    errBox?.classList.add("hidden");
+    okBox?.classList.add("hidden");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Creating account...";
+    }
+
+    const result = await authService.register({
+      fullName,
+      email,
+      mobileNumber,
+      password,
+      accountType
+    });
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Create Account";
+    }
+
+    if (!result.success || !result.user) {
+      if (errBox) {
+        errBox.textContent = result.error || "Could not create account.";
+        errBox.classList.remove("hidden");
+      }
+      return;
+    }
+
+    if (result.requiresEmailConfirmation) {
+      if (okBox) {
+        okBox.textContent = "Account created! Please check your email to confirm your address before signing in.";
+        okBox.classList.remove("hidden");
+      }
+      regForm.reset();
+      return;
+    }
+
+    state.authUser = result.user;
+    syncPublicAuthHeader();
+    showToast(`Welcome to ARTISAN, ${result.user.fullName}!`, "success");
+    regForm.reset();
+    navigateAndRender(getDashboardRouteForRole(result.user.accountType));
+  });
+}
+
+function setupInfoModal() {
+  const modal = document.getElementById("info-policy-modal");
+  const titleEl = document.getElementById("info-modal-title");
+  const bodyEl = document.getElementById("info-modal-body");
+  const closeBtn = document.getElementById("btn-close-info-modal");
+
+  closeBtn?.addEventListener("click", () => modal?.classList.add("hidden"));
+
+  const contentMap = {
+    faqs: {
+      title: "Frequently Asked Questions",
+      body: `<p><strong>How does ARTISAN calculate prices?</strong><br/>Prices combine raw material costs and skilled working hours at a fair hourly wage.</p><p><strong>Do buyers contact artisans directly?</strong><br/>Yes. Enquiries, phone calls, and WhatsApp messages go directly to the creator with zero middlemen.</p>`
+    },
+    privacy: {
+      title: "Privacy Policy",
+      body: `<p>ARTISAN collects only the account details and enquiry contact information required to connect buyers and artisans safely. We never sell personal data to third parties.</p>`
+    },
+    terms: {
+      title: "Terms & Conditions",
+      body: `<p>Artisans retain full ownership of their craft listings and pricing. Buyers and artisans agree to communicate respectfully and honor fair-trade commitments.</p>`
+    }
+  };
+
+  document.querySelectorAll("[data-info-modal]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.getAttribute("data-info-modal");
+      const entry = contentMap[key];
+      if (!entry || !modal || !titleEl || !bodyEl) return;
+      titleEl.textContent = entry.title;
+      bodyEl.innerHTML = entry.body;
+      modal.classList.remove("hidden");
+    });
+  });
+}
+
 function renderDashboard() {
   const greetingName = document.getElementById("dash-greeting-name");
   if (greetingName) {
-    greetingName.textContent = state.currentArtisan?.fullName || "Artisan";
+    greetingName.textContent = state.authUser?.fullName || state.currentArtisan?.fullName || "Artisan";
   }
 
   const totalCount = state.products.length;
@@ -406,15 +1025,14 @@ function renderDashboard() {
   if (elInq) elInq.textContent = String(enquiriesCount);
   if (sidebarBadge) sidebarBadge.textContent = String(enquiriesCount);
 
-  // Recent Products (up to 4)
   const recentGrid = document.getElementById("dash-recent-products");
   if (recentGrid) {
     const recent = state.products.slice(0, 4);
     if (recent.length === 0) {
       recentGrid.innerHTML = `
-        <div class="col-span-full p-8 rounded-2xl bg-white border border-[#DDD3C3] text-center space-y-2">
-          <p class="font-serif font-bold text-[#34332F]">No products added yet</p>
-          <p class="text-xs text-[#66625A]">Tap "Add New Product" to upload your first craft photo.</p>
+        <div class="col-span-full p-8 rounded-2xl bg-white border border-[#E6E4DD] text-center space-y-2">
+          <p class="font-serif font-bold text-[#292929]">No products added yet</p>
+          <p class="text-xs text-[#5C5C57]">Tap "Add New Product" to upload your first craft photo.</p>
         </div>
       `;
     } else {
@@ -423,23 +1041,23 @@ function renderDashboard() {
         const isPublished = p.isApprovedByArtisan !== false;
         return `
           <div class="craft-card rounded-2xl overflow-hidden flex flex-col">
-            <div class="relative aspect-[4/3] bg-[#E9DFD0] overflow-hidden">
+            <div class="relative aspect-[4/3] bg-[#F0EFF5] overflow-hidden">
               <img src="${p.enhancedImageUrl || p.imageUrl}" alt="${escapeHtml(localizedTitle)}" loading="lazy" class="w-full h-full object-cover" />
               <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                isPublished ? "bg-[#F8F5EF]/95 text-[#414A37]" : "bg-[#E9DFD0] text-[#B9674B]"
+                isPublished ? "bg-[#DCE5C5] text-[#292929]" : "bg-[#EBC5A9] text-[#292929]"
               }">
                 ${isPublished ? "Published" : "Pending Approval"}
               </span>
             </div>
             <div class="p-4 flex-1 flex flex-col justify-between gap-3">
               <div>
-                <div class="text-[11px] font-semibold text-[#89977B] uppercase tracking-wide truncate">${escapeHtml(p.category)}</div>
-                <h3 class="font-serif font-bold text-sm text-[#34332F] line-clamp-1 mt-0.5">${escapeHtml(localizedTitle)}</h3>
-                <div class="font-serif text-base font-bold text-[#414A37] mt-1">₹${Number(p.finalPrice).toLocaleString("en-IN")}</div>
+                <div class="text-[11px] font-semibold text-[#3F4D22] uppercase tracking-wide truncate">${escapeHtml(p.category)}</div>
+                <h3 class="font-serif font-bold text-sm text-[#292929] line-clamp-1 mt-0.5">${escapeHtml(localizedTitle)}</h3>
+                <div class="font-serif text-base font-bold text-[#292929] mt-1">₹${Number(p.finalPrice).toLocaleString("en-IN")}</div>
               </div>
-              <div class="flex items-center gap-2 pt-2 border-t border-[#EAE2D5]">
-                <button type="button" data-dash-action="view" data-id="${p.id}" class="flex-1 py-2 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-semibold border border-[#DDD3C3] cursor-pointer">View</button>
-                <button type="button" data-dash-action="edit" data-id="${p.id}" class="flex-1 py-2 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs font-semibold cursor-pointer">Edit</button>
+              <div class="flex items-center gap-2 pt-2 border-t border-[#E6E4DD]">
+                <button type="button" data-dash-action="view" data-id="${p.id}" class="flex-1 py-2 rounded-xl bg-[#FAFAF8] hover:bg-[#DCE5C5] text-[#292929] text-xs font-semibold border border-[#E6E4DD] cursor-pointer">View</button>
+                <button type="button" data-dash-action="edit" data-id="${p.id}" class="flex-1 py-2 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] text-xs font-semibold cursor-pointer">Edit</button>
               </div>
             </div>
           </div>
@@ -462,13 +1080,12 @@ function renderDashboard() {
     }
   }
 
-  // Recent Buyer Enquiries (up to 3)
   const recentEnqEl = document.getElementById("dash-recent-enquiries");
   if (recentEnqEl) {
     const latest = state.inquiries.slice(0, 3);
     if (latest.length === 0) {
       recentEnqEl.innerHTML = `
-        <div class="p-4 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] text-xs text-[#66625A] text-center">
+        <div class="p-4 rounded-2xl bg-[#FAFAF8] border border-[#E6E4DD] text-xs text-[#5C5C57] text-center">
           No buyer enquiries yet. When buyers ask about your crafts, they appear here.
         </div>
       `;
@@ -476,12 +1093,12 @@ function renderDashboard() {
       recentEnqEl.innerHTML = latest.map(inq => {
         const prod = state.products.find(p => p.id === inq.productId) || { title: "Handcrafted Item" };
         return `
-          <div class="p-3 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] flex items-start justify-between gap-2.5">
+          <div class="p-3 rounded-2xl bg-[#FAFAF8] border border-[#E6E4DD] flex items-start justify-between gap-2.5">
             <div class="min-w-0">
-              <div class="text-xs font-bold text-[#34332F] truncate">${escapeHtml(inq.buyerName)}</div>
-              <div class="text-[11px] text-[#66625A] truncate">${escapeHtml(prod.title)} • ${inq.quantity || 1} pc</div>
+              <div class="text-xs font-bold text-[#292929] truncate">${escapeHtml(inq.buyerName)}</div>
+              <div class="text-[11px] text-[#5C5C57] truncate">${escapeHtml(prod.title)} • ${inq.quantity || 1} pc</div>
             </div>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E9DFD0] text-[#B9674B] flex-shrink-0">New</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#EBC5A9] text-[#292929] flex-shrink-0">New</span>
           </div>
         `;
       }).join("");
@@ -844,13 +1461,13 @@ function goToWizardStep(stepNum) {
   // Update 3-step indicator pills
   document.querySelectorAll(".step-indicator-pill").forEach(pill => {
     const pStep = Number(pill.getAttribute("data-step"));
-    pill.classList.remove("bg-[#414A37]", "bg-[#89977B]/25", "bg-[#F8F5EF]", "text-white", "text-[#414A37]", "text-[#66625A]", "border", "border-[#DDD3C3]");
+    pill.classList.remove("bg-[#B8C77B]", "bg-[#DCE5C5]", "bg-[#FAFAF8]", "text-[#292929]", "text-[#5C5C57]", "border", "border-[#E6E4DD]");
     if (pStep === stepNum) {
-      pill.classList.add("bg-[#414A37]", "text-white");
+      pill.classList.add("bg-[#B8C77B]", "text-[#292929]");
     } else if (pStep < stepNum) {
-      pill.classList.add("bg-[#89977B]/25", "text-[#414A37]");
+      pill.classList.add("bg-[#DCE5C5]", "text-[#292929]");
     } else {
-      pill.classList.add("bg-[#F8F5EF]", "text-[#66625A]", "border", "border-[#DDD3C3]");
+      pill.classList.add("bg-[#FAFAF8]", "text-[#5C5C57]", "border", "border-[#E6E4DD]");
     }
   });
 
@@ -1250,6 +1867,11 @@ async function fetchProducts() {
     const data = await res.json();
     if (data.products && Array.isArray(data.products)) {
       state.products = data.products;
+      renderHomeFeaturedProducts();
+      renderPublicExplore();
+      if (state.currentRoute?.name === "product" && state.currentRoute?.params?.id) {
+        renderPublicProductDetail(state.currentRoute.params.id);
+      }
       renderDashboard();
       renderCatalog();
       renderArtisanStudio();
@@ -1303,12 +1925,11 @@ function setupCatalogFilters() {
       state.selectedStatus = btn.getAttribute("data-status") || "all";
       statusButtons.forEach(b => {
         const active = b === btn;
-        b.classList.toggle("bg-[#414A37]", active);
-        b.classList.toggle("text-white", active);
-        b.classList.toggle("bg-[#F8F5EF]", !active);
-        b.classList.toggle("text-[#34332F]", !active);
+        b.classList.toggle("bg-[#B8C77B]", active);
+        b.classList.toggle("text-[#292929]", active);
+        b.classList.toggle("bg-[#FAFAF8]", !active);
         b.classList.toggle("border", !active);
-        b.classList.toggle("border-[#DDD3C3]", !active);
+        b.classList.toggle("border-[#E6E4DD]", !active);
       });
       renderCatalog();
     });
@@ -1384,7 +2005,7 @@ function renderCatalog() {
 
     return `
       <div class="craft-card rounded-2xl overflow-hidden flex flex-col group">
-        <div class="relative aspect-[4/3] bg-[#E9DFD0] overflow-hidden">
+        <div class="relative aspect-[4/3] bg-[#F0EFF5] overflow-hidden">
           <img
             src="${p.enhancedImageUrl || p.imageUrl}"
             alt="${escapeHtml(localizedTitle)}"
@@ -1392,35 +2013,35 @@ function renderCatalog() {
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
           <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-semibold shadow-xs ${
-            isPublished ? "bg-[#F8F5EF]/95 text-[#414A37]" : "bg-[#E9DFD0] text-[#B9674B]"
+            isPublished ? "bg-[#DCE5C5] text-[#292929]" : "bg-[#EBC5A9] text-[#292929]"
           }">
             ${isPublished ? "Published" : "Pending Approval"}
           </span>
           ${p.hasGiTag ? `
-            <span class="absolute bottom-3 left-3 bg-[#F8F5EF]/95 text-[#B9674B] text-[10px] font-semibold px-2.5 py-0.5 rounded-full border border-[#DDD3C3]">
+            <span class="absolute bottom-3 left-3 bg-white/95 text-[#292929] text-[10px] font-semibold px-2.5 py-0.5 rounded-full border border-[#E6E4DD]">
               GI Heritage
             </span>
           ` : ""}
-          <span class="absolute bottom-3 right-3 bg-[#34332F]/85 text-[#F8F5EF] text-[11px] font-medium px-2.5 py-0.5 rounded-full">
+          <span class="absolute bottom-3 right-3 bg-white/95 text-[#292929] text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-[#E6E4DD]">
             ${escapeHtml(p.originState || "India")}
           </span>
         </div>
 
         <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
           <div>
-            <div class="flex items-center justify-between text-[11px] text-[#89977B] font-semibold uppercase tracking-wide mb-1">
+            <div class="flex items-center justify-between text-[11px] text-[#3F4D22] font-semibold uppercase tracking-wide mb-1">
               <span class="truncate">${escapeHtml(p.category)}</span>
-              <span class="text-[#66625A] font-normal truncate ml-2">${escapeHtml(artisan.fullName)}</span>
+              <span class="text-[#5C5C57] font-normal truncate ml-2">${escapeHtml(artisan.fullName)}</span>
             </div>
-            <h3 class="font-serif font-bold text-[#34332F] text-base leading-snug line-clamp-2">
+            <h3 class="font-serif font-bold text-[#292929] text-base leading-snug line-clamp-2">
               ${escapeHtml(localizedTitle)}
             </h3>
           </div>
 
-          <div class="space-y-3 pt-3 border-t border-[#EAE2D5]">
+          <div class="space-y-3 pt-3 border-t border-[#E6E4DD]">
             <div class="flex items-baseline justify-between">
-              <span class="text-xs text-[#66625A]">Suggested Price</span>
-              <span class="font-serif text-lg font-bold text-[#414A37]">₹${Number(p.finalPrice).toLocaleString("en-IN")}</span>
+              <span class="text-xs text-[#5C5C57]">Suggested Price</span>
+              <span class="font-serif text-lg font-bold text-[#292929]">₹${Number(p.finalPrice).toLocaleString("en-IN")}</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
@@ -1428,7 +2049,7 @@ function renderCatalog() {
                 type="button"
                 data-action="view-product"
                 data-id="${p.id}"
-                class="min-h-[40px] px-3 py-2 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-semibold border border-[#DDD3C3] transition-colors cursor-pointer"
+                class="min-h-[40px] px-3 py-2 rounded-xl bg-[#FAFAF8] hover:bg-[#DCE5C5] text-[#292929] text-xs font-semibold border border-[#E6E4DD] transition-colors cursor-pointer"
               >
                 View
               </button>
@@ -1436,7 +2057,7 @@ function renderCatalog() {
                 type="button"
                 data-action="edit-product"
                 data-id="${p.id}"
-                class="min-h-[40px] px-3 py-2 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs font-semibold transition-colors cursor-pointer"
+                class="min-h-[40px] px-3 py-2 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] text-xs font-semibold transition-colors cursor-pointer"
               >
                 Edit
               </button>
@@ -1447,7 +2068,7 @@ function renderCatalog() {
                 type="button"
                 data-action="share-card"
                 data-id="${p.id}"
-                class="flex-1 py-1.5 rounded-lg text-[#414A37] hover:bg-[#E9DFD0]/50 font-medium cursor-pointer"
+                class="flex-1 py-1.5 rounded-lg text-[#3F4D22] hover:bg-[#DCE5C5]/50 font-medium cursor-pointer"
                 title="Download Printable Card"
               >
                 Share Card
@@ -1456,7 +2077,7 @@ function renderCatalog() {
                 type="button"
                 data-action="open-inquiry"
                 data-id="${p.id}"
-                class="flex-1 py-1.5 rounded-lg text-[#B9674B] hover:bg-[#E9DFD0]/50 font-semibold cursor-pointer"
+                class="flex-1 py-1.5 rounded-lg text-[#292929] hover:bg-[#EBC5A9]/50 font-semibold cursor-pointer"
               >
                 Buyer Enquiry
               </button>
@@ -1734,9 +2355,9 @@ async function fetchInquiries() {
 function buildInquiriesListHTML() {
   if (state.inquiries.length === 0) {
     return `
-      <div class="p-8 text-center bg-white rounded-2xl border border-[#DDD3C3] space-y-2">
-        <p class="font-serif font-bold text-[#34332F]">No buyer enquiries yet</p>
-        <p class="text-xs sm:text-sm text-[#66625A]">When buyers ask about your products, their phone and WhatsApp details will appear here.</p>
+      <div class="p-8 text-center bg-white rounded-2xl border border-[#E6E4DD] space-y-2">
+        <p class="font-serif font-bold text-[#292929]">No buyer enquiries yet</p>
+        <p class="text-xs sm:text-sm text-[#5C5C57]">When buyers ask about your products, their phone and WhatsApp details will appear here.</p>
       </div>
     `;
   }
@@ -1747,26 +2368,26 @@ function buildInquiriesListHTML() {
     const waLink = `https://wa.me/${rawPhone}?text=${encodeURIComponent(`Namaste ${inq.buyerName}, thank you for asking about our handcrafted ${prod.title}. I am happy to help with your order!`)}`;
 
     return `
-      <div class="p-4 sm:p-5 bg-white rounded-2xl border border-[#DDD3C3] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="p-4 sm:p-5 bg-white rounded-2xl border border-[#E6E4DD] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="font-serif font-bold text-[#34332F] text-sm sm:text-base">${escapeHtml(inq.buyerName)}</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#E9DFD0] text-[#B9674B] font-semibold">${inq.quantity || 1} unit(s)</span>
-            <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#89977B]/20 text-[#414A37] font-semibold">New</span>
-            <span class="text-[11px] text-[#66625A]">${new Date(inq.createdAt).toLocaleDateString()}</span>
+            <span class="font-serif font-bold text-[#292929] text-sm sm:text-base">${escapeHtml(inq.buyerName)}</span>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#EBC5A9] text-[#292929] font-semibold">${inq.quantity || 1} unit(s)</span>
+            <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#DCE5C5] text-[#292929] font-semibold">New</span>
+            <span class="text-[11px] text-[#5C5C57]">${new Date(inq.createdAt).toLocaleDateString()}</span>
           </div>
-          <div class="text-xs sm:text-sm text-[#34332F] font-medium">
+          <div class="text-xs sm:text-sm text-[#292929] font-medium">
             Product: ${escapeHtml(prod.title)} (₹${Number(prod.finalPrice).toLocaleString("en-IN")})
           </div>
-          <div class="text-xs text-[#66625A]">
+          <div class="text-xs text-[#5C5C57]">
             ${escapeHtml(inq.buyerLocation || "India")} • "${escapeHtml(inq.message || "Interested in ordering")}"
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
-          <a href="${waLink}" target="_blank" class="px-4 py-2.5 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs font-semibold transition-colors">
+          <a href="${waLink}" target="_blank" class="px-4 py-2.5 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] text-xs font-semibold transition-colors">
             WhatsApp
           </a>
-          <a href="tel:${escapeHtml(inq.buyerPhone)}" class="px-4 py-2.5 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] text-xs font-semibold transition-colors">
+          <a href="tel:${escapeHtml(inq.buyerPhone)}" class="px-4 py-2.5 rounded-xl bg-[#FAFAF8] hover:bg-[#DCE5C5] text-[#292929] border border-[#E6E4DD] text-xs font-semibold transition-colors">
             Call
           </a>
         </div>
@@ -1794,7 +2415,7 @@ function renderArtisanStudio() {
   if (studioProductsList) {
     if (myCrafts.length === 0) {
       studioProductsList.innerHTML = `
-        <div class="col-span-full p-6 bg-white rounded-2xl border border-[#DDD3C3] text-center text-xs sm:text-sm text-[#66625A]">
+        <div class="col-span-full p-6 bg-white rounded-2xl border border-[#E6E4DD] text-center text-xs sm:text-sm text-[#5C5C57]">
           No products in your studio yet. Tap "Add New Product" to create one.
         </div>
       `;
@@ -1803,23 +2424,23 @@ function renderArtisanStudio() {
         const isPublished = p.isApprovedByArtisan !== false;
         return `
           <div class="craft-card rounded-2xl overflow-hidden flex flex-col">
-            <div class="relative aspect-[4/3] bg-[#E9DFD0] overflow-hidden">
+            <div class="relative aspect-[4/3] bg-[#F0EFF5] overflow-hidden">
               <img src="${p.enhancedImageUrl || p.imageUrl}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover" />
               <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                isPublished ? "bg-[#F8F5EF]/95 text-[#414A37]" : "bg-[#E9DFD0] text-[#B9674B]"
+                isPublished ? "bg-[#DCE5C5] text-[#292929]" : "bg-[#EBC5A9] text-[#292929]"
               }">
                 ${isPublished ? "Published" : "Pending"}
               </span>
             </div>
             <div class="p-4 flex-1 flex flex-col justify-between gap-3">
               <div>
-                <div class="text-[11px] font-semibold text-[#89977B] uppercase">${escapeHtml(p.category)}</div>
-                <h4 class="font-serif font-bold text-sm text-[#34332F] line-clamp-1 mt-0.5">${escapeHtml(p.title)}</h4>
-                <div class="font-serif text-base font-bold text-[#414A37] mt-1">₹${Number(p.finalPrice).toLocaleString("en-IN")}</div>
+                <div class="text-[11px] font-semibold text-[#3F4D22] uppercase">${escapeHtml(p.category)}</div>
+                <h4 class="font-serif font-bold text-sm text-[#292929] line-clamp-1 mt-0.5">${escapeHtml(p.title)}</h4>
+                <div class="font-serif text-base font-bold text-[#292929] mt-1">₹${Number(p.finalPrice).toLocaleString("en-IN")}</div>
               </div>
               <div class="grid grid-cols-2 gap-2">
-                <button type="button" data-studio-view="${p.id}" class="py-2 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-semibold border border-[#DDD3C3] cursor-pointer">View</button>
-                <button type="button" data-studio-edit="${p.id}" class="py-2 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs font-semibold cursor-pointer">Edit</button>
+                <button type="button" data-studio-view="${p.id}" class="py-2 rounded-xl bg-[#FAFAF8] hover:bg-[#DCE5C5] text-[#292929] text-xs font-semibold border border-[#E6E4DD] cursor-pointer">View</button>
+                <button type="button" data-studio-edit="${p.id}" class="py-2 rounded-xl bg-[#B8C77B] hover:bg-[#a6b668] text-[#292929] text-xs font-semibold cursor-pointer">Edit</button>
               </div>
             </div>
           </div>
@@ -1972,10 +2593,10 @@ function syncAdvisorLangToggle() {
   const btnHi = document.getElementById("advisor-lang-hi");
   if (!btnEn || !btnHi) return;
   const isHi = state.currentLang === "hi";
-  btnHi.classList.toggle("bg-[#414A37]", isHi);
-  btnHi.classList.toggle("text-white", isHi);
-  btnEn.classList.toggle("bg-[#414A37]", !isHi);
-  btnEn.classList.toggle("text-white", !isHi);
+  btnHi.classList.toggle("bg-[#B8C77B]", isHi);
+  btnHi.classList.toggle("text-[#292929]", isHi);
+  btnEn.classList.toggle("bg-[#B8C77B]", !isHi);
+  btnEn.classList.toggle("text-[#292929]", !isHi);
 }
 
 function setupAIChatAdvisor() {
@@ -2094,7 +2715,7 @@ async function submitAIChatMessage(messageText) {
   const userBubble = document.createElement("div");
   userBubble.className = "flex items-start justify-end gap-2.5";
   userBubble.innerHTML = `
-    <div class="bg-[#414A37] text-[#F8F5EF] px-4 py-3 rounded-2xl rounded-tr-xs text-xs sm:text-sm max-w-xl leading-relaxed">
+    <div class="bg-[#DCE5C5] text-[#292929] px-4 py-3 rounded-2xl rounded-tr-xs text-xs sm:text-sm max-w-xl leading-relaxed border border-[#B8C77B]/60">
       ${escapeHtml(messageText)}
     </div>
   `;
@@ -2131,13 +2752,13 @@ async function submitAIChatMessage(messageText) {
     const aiBubble = document.createElement("div");
     aiBubble.className = "flex items-start gap-2.5 max-w-2xl";
     aiBubble.innerHTML = `
-      <div class="w-8 h-8 rounded-xl bg-[#414A37] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+      <div class="w-8 h-8 rounded-xl bg-[#B8C77B] text-[#292929] flex items-center justify-center text-xs font-bold flex-shrink-0">
         AI
       </div>
-      <div class="bg-white p-4 rounded-2xl rounded-tl-xs border border-[#DDD3C3] text-xs sm:text-sm text-[#34332F] space-y-2 leading-relaxed">
-        <div class="flex items-center justify-between text-[11px] text-[#66625A] border-b border-[#EAE2D5] pb-1.5 mb-1 font-medium">
+      <div class="bg-white p-4 rounded-2xl rounded-tl-xs border border-[#E6E4DD] text-xs sm:text-sm text-[#292929] space-y-2 leading-relaxed">
+        <div class="flex items-center justify-between text-[11px] text-[#5C5C57] border-b border-[#E6E4DD] pb-1.5 mb-1 font-medium">
           <span>Artisan Advisor</span>
-          <button type="button" class="btn-copy-chat hover:text-[#414A37] cursor-pointer" title="Copy answer">Copy</button>
+          <button type="button" class="btn-copy-chat hover:text-[#292929] cursor-pointer" title="Copy answer">Copy</button>
         </div>
         <div class="chat-reply-content">
           ${formattedReply}
@@ -2161,10 +2782,10 @@ async function submitAIChatMessage(messageText) {
     const errBubble = document.createElement("div");
     errBubble.className = "flex items-start gap-2.5 max-w-2xl";
     errBubble.innerHTML = `
-      <div class="w-8 h-8 rounded-xl bg-[#B9674B] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+      <div class="w-8 h-8 rounded-xl bg-[#EBC5A9] text-[#292929] flex items-center justify-center text-xs font-bold flex-shrink-0">
         !
       </div>
-      <div class="bg-[#E9DFD0] p-4 rounded-2xl rounded-tl-xs border border-[#DDD3C3] text-xs sm:text-sm text-[#34332F] leading-relaxed">
+      <div class="bg-[#EBC5A9]/50 p-4 rounded-2xl rounded-tl-xs border border-[#EBC5A9] text-xs sm:text-sm text-[#292929] leading-relaxed">
         Could not connect to the AI Advisor right now. Please make sure the server is running and try again.
       </div>
     `;

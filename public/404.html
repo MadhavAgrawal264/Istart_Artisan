@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ARTISAN — Redirecting...</title>
+    <script>
+      (function () {
+        var l = window.location;
+        try {
+          sessionStorage.setItem("artisan_spa_redirect", l.pathname + l.search + l.hash);
+        } catch (e) {}
+        var segments = l.pathname.split("/").filter(Boolean);
+        var base = segments.length > 0 && segments[0] === "Istart_Artisan" ? "/Istart_Artisan/" : "/";
+        l.replace(l.origin + base);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import path from "path";
+import crypto from "crypto";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
@@ -8,7 +9,7 @@ import { INITIAL_ARTISANS, INITIAL_PRODUCTS } from "./src/catalog-data.js";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Body parser with 50MB limit to handle high-resolution craft photos
 app.use(express.json({ limit: "50mb" }));
@@ -869,6 +870,198 @@ app.post("/api/inquiries", async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ error: "Failed to submit inquiry", details: err.message });
   }
+});
+
+// ==============================================================================
+// 7B. AUTHENTICATION & CONTACT ENDPOINTS (REAL SCRYPT + HMAC-SHA256 SESSIONS)
+// ==============================================================================
+interface StoredAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  mobileNumber: string;
+  accountType: "artisan" | "buyer" | "organization";
+  organizationName?: string;
+  passwordSalt: string;
+  passwordHash: string;
+  createdAt: string;
+}
+
+const AUTH_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString("hex");
+const registeredAccounts: StoredAccount[] = [];
+const revokedTokens = new Set<string>();
+const contactMessages: Array<{
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+}> = [];
+
+function hashPassword(password: string, salt: string): string {
+  return crypto.scryptSync(password, salt, 64).toString("hex");
+}
+
+function signAuthToken(userId: string): string {
+  const payload = Buffer.from(JSON.stringify({ sub: userId, iat: Date.now() })).toString("base64url");
+  const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
+  return `${payload}.${sig}`;
+}
+
+function verifyAuthToken(token: string): string | null {
+  if (!token || revokedTokens.has(token)) return null;
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+  const [payload, sig] = parts;
+  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
+  const sigBuf = Buffer.from(sig);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    return parsed?.sub ? String(parsed.sub) : null;
+  } catch {
+    return null;
+  }
+}
+
+function sanitizeAccount(acc: StoredAccount) {
+  return {
+    id: acc.id,
+    fullName: acc.fullName,
+    email: acc.email,
+    mobileNumber: acc.mobileNumber,
+    accountType: acc.accountType,
+    organizationName: acc.organizationName,
+  };
+}
+
+app.post("/api/auth/register", (req: Request, res: Response) => {
+  const { fullName, email, mobileNumber, password, accountType = "buyer", organizationName } = req.body || {};
+
+  if (!fullName || String(fullName).trim().length < 2) {
+    return res.status(400).json({ success: false, error: "Please enter your full name." });
+  }
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail || !normalizedEmail.includes("@")) {
+    return res.status(400).json({ success: false, error: "Please enter a valid email address." });
+  }
+  if (!mobileNumber || String(mobileNumber).trim().length < 8) {
+    return res.status(400).json({ success: false, error: "Please enter a valid mobile number." });
+  }
+  if (!password || String(password).length < 6) {
+    return res.status(400).json({ success: false, error: "Password must be at least 6 characters." });
+  }
+  if (registeredAccounts.some(a => a.email === normalizedEmail)) {
+    return res.status(409).json({ success: false, error: "An account with this email already exists." });
+  }
+
+  const validType = accountType === "artisan" || accountType === "organization" ? accountType : "buyer";
+  const salt = crypto.randomBytes(16).toString("hex");
+  const newAccount: StoredAccount = {
+    id: `user-${crypto.randomUUID()}`,
+    fullName: String(fullName).trim(),
+    email: normalizedEmail,
+    mobileNumber: String(mobileNumber).trim(),
+    accountType: validType,
+    organizationName: organizationName ? String(organizationName).trim() : undefined,
+    passwordSalt: salt,
+    passwordHash: hashPassword(String(password), salt),
+    createdAt: new Date().toISOString(),
+  };
+
+  registeredAccounts.push(newAccount);
+  const token = signAuthToken(newAccount.id);
+
+  if (validType === "artisan") {
+    inMemoryArtisans.push({
+      id: newAccount.id,
+      fullName: newAccount.fullName,
+      phone: newAccount.mobileNumber,
+      email: newAccount.email,
+      state: "India",
+      districtVillage: "Craft Cluster",
+      craftSpecialty: "Traditional Handcrafted Goods",
+      craftTradition: "Handmade Heritage",
+      yearsExperience: 1,
+      upiId: "",
+      bio: "Verified artisan registered on ARTISAN.",
+      profileImage: "./assets/sitadevi_profile.jpg",
+      isVerified: true,
+      hasGiTag: false,
+      preferredLanguage: "hi",
+    });
+  }
+
+  return res.status(201).json({
+    success: true,
+    user: sanitizeAccount(newAccount),
+    token,
+  });
+});
+
+app.post("/api/auth/login", (req: Request, res: Response) => {
+  const { email, password } = req.body || {};
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const account = registeredAccounts.find(a => a.email === normalizedEmail);
+  if (!account || !password) {
+    return res.status(401).json({ success: false, error: "Invalid email or password." });
+  }
+
+  const candidateHash = hashPassword(String(password), account.passwordSalt);
+  const aBuf = Buffer.from(candidateHash, "hex");
+  const bBuf = Buffer.from(account.passwordHash, "hex");
+  if (aBuf.length !== bBuf.length || !crypto.timingSafeEqual(aBuf, bBuf)) {
+    return res.status(401).json({ success: false, error: "Invalid email or password." });
+  }
+
+  const token = signAuthToken(account.id);
+  return res.json({
+    success: true,
+    user: sanitizeAccount(account),
+    token,
+  });
+});
+
+app.get("/api/auth/me", (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  const userId = verifyAuthToken(token);
+  if (!userId) {
+    return res.status(401).json({ success: false, error: "Not authenticated" });
+  }
+  const account = registeredAccounts.find(a => a.id === userId);
+  if (!account) {
+    return res.status(401).json({ success: false, error: "Account not found" });
+  }
+  return res.json({ success: true, user: sanitizeAccount(account) });
+});
+
+app.post("/api/auth/logout", (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  if (token) revokedTokens.add(token);
+  return res.json({ success: true });
+});
+
+app.post("/api/contact", (req: Request, res: Response) => {
+  const { name, email, subject = "General Enquiry", message } = req.body || {};
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, error: "Please fill in your name, email, and message." });
+  }
+  const entry = {
+    id: `msg-${Date.now()}`,
+    name: String(name).trim(),
+    email: String(email).trim(),
+    subject: String(subject).trim(),
+    message: String(message).trim(),
+    createdAt: new Date().toISOString(),
+  };
+  contactMessages.unshift(entry);
+  return res.status(201).json({ success: true, contact: entry });
 });
 
 // ==============================================================================
