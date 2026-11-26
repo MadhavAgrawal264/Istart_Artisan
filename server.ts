@@ -644,6 +644,27 @@ app.post("/api/products", async (req: Request, res: Response) => {
   }
 });
 
+app.put("/api/products/:id", (req: Request, res: Response) => {
+  try {
+    const idx = inMemoryProducts.findIndex(p => p.id === req.params.id);
+    if (idx === -1) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const updates = req.body || {};
+    inMemoryProducts[idx] = {
+      ...inMemoryProducts[idx],
+      ...(updates.title !== undefined ? { title: updates.title } : {}),
+      ...(updates.category !== undefined ? { category: updates.category } : {}),
+      ...(updates.finalPrice !== undefined ? { finalPrice: Number(updates.finalPrice) } : {}),
+      ...(updates.description !== undefined ? { description: updates.description } : {}),
+      ...(updates.isApprovedByArtisan !== undefined ? { isApprovedByArtisan: Boolean(updates.isApprovedByArtisan) } : {}),
+    };
+    res.json({ success: true, product: inMemoryProducts[idx] });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to update product", details: err.message });
+  }
+});
+
 // ==============================================================================
 // 5B. OFFLINE-FIRST BATCH SYNCHRONIZATION ENGINE ENDPOINT
 // ==============================================================================

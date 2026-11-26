@@ -24,435 +24,358 @@ export function renderMaterialPricingWizardHTML(): string {
   const defaultTimelineHTML = renderFinancialTimelineHTML("listed");
 
   return `
-    <div id="artisan-pricing-suite" class="max-w-5xl mx-auto space-y-8 font-sans">
-      
-      <!-- Top Network Sync Status Banner -->
-      <div id="sync-status-banner" class="rounded-2xl p-4 bg-[#EAF1ED] border border-[#6F9B88]/40 flex items-center justify-between shadow-xs transition-all">
-        <div class="flex items-center gap-3">
-          <span id="sync-status-indicator" class="w-2.5 h-2.5 rounded-full bg-[#174C43] pulse-subtle"></span>
-          <span id="sync-status-text" class="text-xs font-bold text-[#174C43]">
-            Online • Cloud Synchronization Active
-          </span>
+    <div id="artisan-pricing-suite" class="max-w-5xl mx-auto space-y-6 font-sans">
+
+      <!-- Page Header & Sync Pill -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]">Fair Pricing Calculator</h1>
+          <p class="text-xs sm:text-sm text-[#66625A] mt-1">Enter your material cost and hours worked to find a fair selling price.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <span id="offline-queue-badge" class="hidden px-2.5 py-1 rounded-full text-xs font-black bg-[#C95D35] text-white shadow-xs">
-            0 Queued
-          </span>
-          <button 
-            type="button" 
-            id="btn-force-sync" 
-            class="hidden px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-[#102F35] border border-[#E6E2D6] hover:bg-[#FAF8F2] shadow-xs transition-colors"
-          >
-            🔄 Sync Now
+
+        <div id="sync-status-banner" class="rounded-xl px-3.5 py-2 bg-[#E9DFD0] border border-[#DDD3C3] flex items-center gap-2.5 text-xs">
+          <span id="sync-status-indicator" class="w-2.5 h-2.5 rounded-full bg-[#414A37] pulse-subtle"></span>
+          <span id="sync-status-text" class="font-semibold text-[#34332F]">Saved & Ready</span>
+          <span id="offline-queue-badge" class="hidden px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#B9674B] text-white">0 Saved</span>
+          <button type="button" id="btn-force-sync" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-[#34332F] border border-[#DDD3C3] cursor-pointer">
+            Sync Now
           </button>
         </div>
       </div>
 
-      <!-- Linear Milestone Timeline (Feature 3) -->
-      <div id="milestone-timeline-container">
-        ${defaultTimelineHTML}
-      </div>
+      <!-- Main Form & Suggested Price Layout -->
+      <form id="craft-pricing-form" class="grid grid-cols-1 lg:grid-cols-12 gap-6" novalidate>
 
-      <!-- Main Form & Pricing Grid -->
-      <form id="craft-pricing-form" class="grid grid-cols-1 lg:grid-cols-12 gap-8" novalidate>
-        
-        <!-- Left Column: Form & Material Validation (Feature 1) -->
-        <div class="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 border border-[#E6E2D6] shadow-xs space-y-6">
-          <div class="flex items-center justify-between pb-4 border-b border-[#E6E2D6]">
+        <!-- Left Column: Simple Everyday Inputs -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-7 border border-[#DDD3C3] shadow-xs space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-[#EAE2D5]">
             <div>
-              <h2 class="text-xl font-bold text-[#102F35] font-serif">1. Material & Labor Specification</h2>
-              <p class="text-xs text-[#566C70]">Fair cost entry with automatic ±30% craft board benchmark checks</p>
+              <h2 class="text-lg sm:text-xl font-bold text-[#34332F] font-serif">Your Work & Material Costs</h2>
+              <p class="text-xs text-[#66625A]">Fill in these 4 simple details in everyday numbers</p>
             </div>
-            <button 
-              type="button" 
-              class="audio-btn p-2 rounded-full text-[#174C43] bg-[#EAF1ED] hover:bg-[#DCEAE2] focus:outline-none focus:ring-2 focus:ring-[#174C43]"
-              data-audio-text="Material and Labor Specification. Select your craft material, enter what you paid, and your hours of work."
-              aria-label="Listen to section instructions"
+            <button
+              type="button"
+              class="audio-btn w-9 h-9 rounded-full text-[#414A37] bg-[#E9DFD0] hover:bg-[#DDD3C3] flex items-center justify-center cursor-pointer"
+              data-audio-text="Enter your product name, choose the main material, type how much the material cost, and how many hours you worked."
+              aria-label="Listen to instructions"
+              title="Listen to instructions"
             >
               🔊
             </button>
           </div>
 
-          <!-- Product Name Input -->
+          <!-- Product Name -->
           <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="product-name-input" class="text-xs font-bold text-[#102F35]">
-                Craft / Product Title
+            <div class="flex items-center justify-between mb-1">
+              <label for="product-name-input" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                1. What did you make?
               </label>
-              <button 
-                type="button" 
-                class="audio-btn text-xs text-[#174C43] hover:underline flex items-center gap-1 font-medium"
-                data-audio-target="product-name-input"
-              >
-                <span>🔊</span> <span>Listen</span>
+              <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="product-name-input">
+                🔊 Listen
               </button>
             </div>
-            <input 
-              type="text" 
-              id="product-name-input" 
+            <input
+              type="text"
+              id="product-name-input"
               name="product_name"
-              required 
-              placeholder="e.g., Hand-carved Teak Elephant, Madhubani Sun Art"
-              class="w-full p-3.5 rounded-xl border border-[#E6E2D6] bg-[#FAF8F2] focus:bg-white focus:ring-2 focus:ring-[#174C43] text-sm font-semibold text-[#102F35] transition-all"
+              required
+              placeholder="Example: Hand-painted Clay Vase or Wooden Toy"
+              class="w-full p-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-medium text-[#34332F]"
             />
           </div>
 
-          <!-- Standardized Material Catalog Dropdown & Numeric Cost Input -->
+          <!-- Material & Material Cost -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Material Dropdown -->
             <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <label for="material-catalog-select" class="text-xs font-bold text-[#102F35]">
-                  Standardized Material
+              <div class="flex items-center justify-between mb-1">
+                <label for="material-catalog-select" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                  2. Main Material Used
                 </label>
-                <button 
-                  type="button" 
-                  class="audio-btn text-xs text-[#174C43] hover:underline flex items-center gap-1 font-medium"
-                  data-audio-text="Standardized Material Catalog. Choose Clay, Yarn, Wood, Silk, Brass, Bamboo, Stone, or Leather."
-                >
-                  <span>🔊</span> <span>Listen</span>
+                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-text="Choose the main material you used, such as wood, clay, yarn, silk, or brass.">
+                  🔊 Listen
                 </button>
               </div>
-              <select 
-                id="material-catalog-select" 
+              <select
+                id="material-catalog-select"
                 name="material_type"
-                class="w-full p-3.5 rounded-xl border border-[#E6E2D6] bg-white focus:ring-2 focus:ring-[#174C43] text-sm font-semibold text-[#102F35] shadow-2xs cursor-pointer"
+                class="w-full p-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-semibold text-[#34332F] cursor-pointer"
               >
-                <!-- Hydrated dynamically from Supabase or Fallback -->
                 <option value="Wood">Wood (Teak / Neem / Sheesham)</option>
                 <option value="Clay">Clay (Terracotta / Pottery)</option>
-                <option value="Yarn">Yarn (Khadi / Organic Cotton)</option>
+                <option value="Yarn">Yarn (Khadi / Cotton)</option>
                 <option value="Silk">Silk (Tussar / Mulberry)</option>
-                <option value="Brass">Brass (Dhokra Bell Metal)</option>
-                <option value="Bamboo">Bamboo (Cane & Reeds)</option>
-                <option value="Stone">Stone (Soapstone / Marble)</option>
-                <option value="Leather">Leather (Vegetable-Tanned)</option>
+                <option value="Brass">Brass (Dhokra Metal)</option>
+                <option value="Bamboo">Bamboo & Cane</option>
+                <option value="Stone">Stone / Marble</option>
+                <option value="Leather">Leather</option>
               </select>
-              <p id="benchmark-hint-text" class="text-[11px] font-medium text-[#566C70] mt-1.5">
-                Standard Benchmark Baseline: <span id="benchmark-baseline-badge" class="font-bold text-[#174C43]">₹450</span>
+              <p id="benchmark-hint-text" class="text-[11px] text-[#66625A] mt-1.5">
+                Typical material cost: <span id="benchmark-baseline-badge" class="font-bold text-[#414A37]">₹450</span>
               </p>
             </div>
 
-            <!-- Custom Numeric Cost Input -->
             <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <label for="material-cost-input" class="text-xs font-bold text-[#102F35]">
-                  Custom Material Cost (₹)
+              <div class="flex items-center justify-between mb-1">
+                <label for="material-cost-input" class="text-xs sm:text-sm font-semibold text-[#34332F]" title="How much money you spent buying raw materials">
+                  3. Money Spent on Materials (₹)
                 </label>
-                <button 
-                  type="button" 
-                  class="audio-btn text-xs text-[#174C43] hover:underline flex items-center gap-1 font-medium"
-                  data-audio-target="material-cost-input"
-                >
-                  <span>🔊</span> <span>Listen</span>
+                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="material-cost-input">
+                  🔊 Listen
                 </button>
               </div>
               <div class="relative">
-                <span class="absolute left-3.5 top-3.5 text-[#566C70] font-bold">₹</span>
-                <input 
-                  type="number" 
-                  id="material-cost-input" 
+                <span class="absolute left-3.5 top-3.5 text-[#66625A] font-bold">₹</span>
+                <input
+                  type="number"
+                  id="material-cost-input"
                   name="custom_material_cost"
-                  min="1" 
+                  min="1"
                   step="1"
-                  value="450" 
+                  value="450"
                   required
-                  placeholder="Enter raw material cost in Rupees"
-                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#E6E2D6] bg-white focus:ring-2 focus:ring-[#174C43] text-sm font-black text-[#102F35] shadow-2xs"
+                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-bold text-[#34332F]"
                 />
               </div>
-              <p class="text-[11px] text-[#566C70] mt-1.5">
-                Monitored within ±30% market baseline window.
-              </p>
+              <p class="text-[11px] text-[#66625A] mt-1.5">We gently alert you if this looks much higher or lower than usual.</p>
             </div>
           </div>
 
-          <!-- Labor Hours & Living Wage Rate -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[#E6E2D6]">
+          <!-- Hours & Fair Hourly Pay -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#EAE2D5]">
             <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <label for="labor-hours-input" class="text-xs font-bold text-[#102F35]">
-                  Handcrafting Hours
+              <div class="flex items-center justify-between mb-1">
+                <label for="labor-hours-input" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                  4. Hours Spent Making It
                 </label>
-                <button 
-                  type="button" 
-                  class="audio-btn text-xs text-[#174C43] hover:underline flex items-center gap-1 font-medium"
-                  data-audio-target="labor-hours-input"
-                >
-                  <span>🔊</span> <span>Listen</span>
+                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="labor-hours-input">
+                  🔊 Listen
                 </button>
               </div>
-              <input 
-                type="number" 
-                id="labor-hours-input" 
+              <input
+                type="number"
+                id="labor-hours-input"
                 name="labor_hours"
-                min="0.5" 
-                step="0.5" 
-                value="12" 
+                min="0.5"
+                step="0.5"
+                value="12"
                 required
-                class="w-full p-3.5 rounded-xl border border-[#E6E2D6] bg-white focus:ring-2 focus:ring-[#174C43] text-sm font-bold text-[#102F35] shadow-2xs"
+                class="w-full p-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-bold text-[#34332F]"
               />
+              <p class="text-[11px] text-[#66625A] mt-1.5">Total time from start to finish.</p>
             </div>
 
             <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <label for="hourly-wage-input" class="text-xs font-bold text-[#102F35]">
-                  Living Wage Rate (₹/hr)
+              <div class="flex items-center justify-between mb-1">
+                <label for="hourly-wage-input" class="text-xs sm:text-sm font-semibold text-[#34332F]">
+                  Fair Pay Per Hour (₹/hr)
                 </label>
-                <button 
-                  type="button" 
-                  class="audio-btn text-xs text-[#174C43] hover:underline flex items-center gap-1 font-medium"
-                  data-audio-target="hourly-wage-input"
-                >
-                  <span>🔊</span> <span>Listen</span>
+                <button type="button" class="audio-btn text-xs text-[#B9674B] hover:underline font-medium cursor-pointer" data-audio-target="hourly-wage-input">
+                  🔊 Listen
                 </button>
               </div>
               <div class="relative">
-                <span class="absolute left-3.5 top-3.5 text-[#566C70] font-bold">₹</span>
-                <input 
-                  type="number" 
-                  id="hourly-wage-input" 
+                <span class="absolute left-3.5 top-3.5 text-[#66625A] font-bold">₹</span>
+                <input
+                  type="number"
+                  id="hourly-wage-input"
                   name="hourly_rate"
-                  min="50" 
-                  step="5" 
-                  value="90" 
+                  min="50"
+                  step="5"
+                  value="90"
                   required
-                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#E6E2D6] bg-white focus:ring-2 focus:ring-[#174C43] text-sm font-bold text-[#102F35] shadow-2xs"
+                  class="w-full pl-8 pr-3.5 py-3.5 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] text-sm font-bold text-[#34332F]"
                 />
               </div>
-              <p class="text-[11px] text-[#174C43] font-semibold mt-1.5">
-                ✓ Compliant with fair rural living standards (≥ ₹80/hr).
-              </p>
+              <p class="text-[11px] text-[#414A37] font-medium mt-1.5">Recommended fair minimum: ₹80/hr or more.</p>
             </div>
           </div>
 
-          <!-- Submit / Sync Action Button -->
-          <div class="pt-6 border-t border-[#E6E2D6] flex items-center justify-between gap-4">
-            <div class="text-xs text-[#566C70]">
-              <span id="offline-safe-text">Offline-Ready: Form automatically queues if internet drops.</span>
-            </div>
-            <button 
-              type="submit" 
+          <!-- Submit Button -->
+          <div class="pt-4 border-t border-[#EAE2D5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span id="offline-safe-text" class="text-xs text-[#66625A]">
+              Works even with slow internet — saves safely on your device.
+            </span>
+            <button
+              type="submit"
               id="btn-submit-listing"
-              class="px-8 py-3.5 rounded-xl bg-[#174C43] hover:bg-[#0F3630] active:scale-95 text-white font-bold text-sm shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+              class="min-h-[48px] px-6 py-3 rounded-2xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Publish Craft Listing</span>
+              <span>Save & Publish Product</span>
               <span>→</span>
             </button>
           </div>
         </div>
 
-        <!-- Right Column: AI Pricing Transparency & Override Simulator (Feature 2) -->
-        <div class="lg:col-span-5 space-y-6">
-          
-          <!-- AI Mathematical Breakdown Card -->
-          <div class="bg-[#FAF8F2] rounded-2xl p-6 border border-[#E6E2D6] shadow-xs space-y-5">
-            <div class="flex items-center justify-between pb-3 border-b border-[#E6E2D6]">
-              <div class="flex items-center gap-2">
-                <span class="text-lg">⚖️</span>
-                <h3 class="text-base font-bold text-[#102F35] font-serif">
-                  AI Pricing Transparency
-                </h3>
+        <!-- Right Column: Prominent Suggested Selling Price + Optional Advanced Controls -->
+        <div class="lg:col-span-5 space-y-5">
+
+          <!-- Prominent Suggested Selling Price Card -->
+          <div class="rounded-3xl bg-[#E9DFD0] p-6 border border-[#DDD3C3] space-y-4">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-[#414A37]">Suggested Selling Price</span>
+                <div id="final-price-display" class="font-serif text-4xl sm:text-5xl font-bold text-[#34332F] mt-1">
+                  ₹1,530
+                </div>
               </div>
-              <button 
-                type="button" 
-                class="audio-btn p-1.5 rounded-full text-[#174C43] hover:bg-[#EAF1ED]"
-                data-audio-text="AI Pricing Formula. Material Cost plus Hours worked multiplied by Hourly Rate equals AI Fair Base Price."
-                aria-label="Listen to pricing formula"
+              <button
+                type="button"
+                id="btn-tts-final-price"
+                class="audio-btn px-3 py-2 rounded-xl text-xs font-semibold bg-white text-[#414A37] border border-[#DDD3C3] hover:bg-[#F8F5EF] flex items-center gap-1 cursor-pointer"
+                data-audio-text="Suggested selling price is 1530 rupees."
+                aria-label="Listen to suggested price"
               >
-                🔊
+                <span>🔊</span> <span>Listen</span>
               </button>
             </div>
 
-            <!-- Mathematical Equation Visualization -->
-            <div class="bg-white rounded-xl p-4 border border-[#E6E2D6] shadow-2xs space-y-3">
-              <div class="text-[11px] font-bold text-[#566C70] uppercase tracking-wider">
-                Transparent Living-Wage Equation:
+            <!-- Simple Plain-Language Breakdown Tiles -->
+            <div class="grid grid-cols-3 gap-2.5 text-center">
+              <div class="bg-white rounded-2xl p-3 border border-[#DDD3C3]">
+                <div class="text-[11px] text-[#66625A] font-medium">Materials</div>
+                <div id="formula-mat-display" class="font-serif text-base font-bold text-[#B9674B] mt-0.5">₹450</div>
               </div>
-              <div class="flex items-center justify-between text-xs sm:text-sm font-black text-[#102F35]">
-                <div class="text-center">
-                  <div class="text-[10px] text-[#566C70] uppercase font-semibold">Material</div>
-                  <span id="formula-mat-display" class="text-[#C95D35] font-extrabold">₹450</span>
-                </div>
-                <span class="text-[#566C70] text-lg">+</span>
-                <div class="text-center">
-                  <div class="text-[10px] text-[#566C70] uppercase font-semibold">Labor Total</div>
-                  <span id="formula-labor-display" class="text-[#174C43] font-extrabold">₹1,080</span>
-                </div>
-                <span class="text-[#566C70] text-lg">=</span>
-                <div class="text-center">
-                  <div class="text-[10px] text-[#174C43] uppercase font-bold">AI Fair Base</div>
-                  <span id="formula-ai-base-display" class="text-[#174C43] font-black text-base">₹1,530</span>
-                </div>
+              <div class="bg-white rounded-2xl p-3 border border-[#DDD3C3]">
+                <div class="text-[11px] text-[#66625A] font-medium">Your Labor</div>
+                <div id="formula-labor-display" class="font-serif text-base font-bold text-[#414A37] mt-0.5">₹1,080</div>
               </div>
-              <div class="text-[10px] text-[#566C70] pt-2 border-t border-[#E6E2D6] flex items-center justify-between">
-                <span>Labor Calculation:</span>
-                <span id="formula-labor-subtext" class="font-semibold text-[#102F35]">12 hrs × ₹90/hr</span>
+              <div class="bg-white rounded-2xl p-3 border border-[#DDD3C3]">
+                <div class="text-[11px] text-[#66625A] font-medium">Fair Base</div>
+                <div id="formula-ai-base-display" class="font-serif text-base font-bold text-[#34332F] mt-0.5">₹1,530</div>
               </div>
             </div>
 
-            <!-- Override Slider Interface -->
-            <div class="bg-white rounded-xl p-4 border border-[#E6E2D6] shadow-2xs space-y-3">
-              <div class="flex items-center justify-between">
-                <label for="price-override-slider" class="text-xs font-bold text-[#102F35]">
-                  Manual Price Override (±25% Max)
-                </label>
-                <span 
-                  id="slider-percent-badge" 
-                  class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FAF8F2] text-[#102F35] border border-[#E6E2D6]"
-                >
-                  0% (AI Default)
-                </span>
-              </div>
-
-              <!-- Native HTML5 Range Input Slider -->
-              <div class="space-y-1.5">
-                <input 
-                  type="range" 
-                  id="price-override-slider" 
-                  name="price_override_slider"
-                  min="-25" 
-                  max="25" 
-                  value="0" 
-                  step="1" 
-                  class="w-full h-2 bg-[#E6E2D6] rounded-lg appearance-none cursor-pointer accent-[#174C43] focus:outline-none focus:ring-2 focus:ring-[#174C43]"
-                  aria-label="Price adjustment percentage slider from minus 25 percent to plus 25 percent"
-                />
-                <div class="flex justify-between text-[10px] font-bold text-[#566C70] px-1">
-                  <span>-25% (Quick Turnaround)</span>
-                  <span>0% (Fair Baseline)</span>
-                  <span>+25% (Premium)</span>
-                </div>
-              </div>
-
-              <!-- Dynamic Final Price Display -->
-              <div class="pt-3 border-t border-[#E6E2D6] flex items-center justify-between">
-                <div>
-                  <span class="text-[10px] font-bold text-[#566C70] uppercase">Final Listing Price</span>
-                  <div id="final-price-display" class="text-2xl sm:text-3xl font-black text-[#174C43]">
-                    ₹1,530
-                  </div>
-                </div>
-                <button 
-                  type="button" 
-                  id="btn-tts-final-price"
-                  class="audio-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-[#EAF1ED] text-[#174C43] border border-[#6F9B88]/30 hover:bg-[#DCEAE2] shadow-2xs flex items-center gap-1"
-                  data-audio-text="Final listing price is 1530 rupees."
-                  aria-label="Listen to final calculated price"
-                >
-                  <span>🔊</span> <span>Listen Price</span>
-                </button>
-              </div>
+            <div class="text-xs text-[#414A37] flex items-center justify-between pt-1">
+              <span>Your time calculation:</span>
+              <span id="formula-labor-subtext" class="font-semibold">12 hrs × ₹90/hr</span>
             </div>
-
-            <!-- Likelihood of Sale Health Meter Card -->
-            <div id="likelihood-health-card" class="bg-white rounded-xl p-4 border border-[#E6E2D6] shadow-2xs space-y-2.5 transition-all">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-sm">📊</span>
-                  <span class="text-xs font-bold text-[#102F35]">Likelihood of Sale Meter</span>
-                </div>
-                <span 
-                  id="likelihood-badge" 
-                  class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EAF1ED] text-[#174C43] border border-[#6F9B88]/40"
-                >
-                  Balanced (80%)
-                </span>
-              </div>
-
-              <!-- Visual Health Gauge Bar -->
-              <div class="w-full h-2.5 rounded-full bg-[#FAF8F2] overflow-hidden border border-[#E6E2D6] relative">
-                <div 
-                  id="likelihood-gauge-bar" 
-                  class="h-full bg-gradient-to-r from-[#6F9B88] to-[#174C43] rounded-full transition-all duration-300"
-                  style="width: 80%;"
-                ></div>
-              </div>
-
-              <p id="likelihood-desc-text" class="text-xs text-[#566C70] leading-snug">
-                Market Recommended: Priced within the optimal sweet spot. Maximizes direct artisan income while maintaining high buyer trust.
-              </p>
-            </div>
-
           </div>
 
-        </div>
+          <!-- Optional Advanced Price Adjustment -->
+          <details class="bg-white rounded-2xl p-5 border border-[#DDD3C3] space-y-4">
+            <summary class="flex items-center justify-between cursor-pointer font-serif font-bold text-sm text-[#34332F]">
+              <span>Adjust Price & Check Sale Chances (Optional)</span>
+              <svg class="details-chevron w-4 h-4 text-[#66625A] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
 
+            <div class="pt-4 space-y-4 border-t border-[#EAE2D5]">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="price-override-slider" class="text-xs font-semibold text-[#34332F]">
+                    Adjust Price Up or Down
+                  </label>
+                  <span id="slider-percent-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3]">
+                    0% (Recommended)
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  id="price-override-slider"
+                  name="price_override_slider"
+                  min="-25"
+                  max="25"
+                  value="0"
+                  step="1"
+                  class="w-full h-2 bg-[#E9DFD0] rounded-lg appearance-none cursor-pointer accent-[#B9674B]"
+                  aria-label="Adjust price percentage from minus 25 percent to plus 25 percent"
+                />
+                <div class="flex justify-between text-[11px] text-[#66625A]">
+                  <span>-25% (Sell Faster)</span>
+                  <span>0% (Fair Price)</span>
+                  <span>+25% (Higher Margin)</span>
+                </div>
+              </div>
+
+              <div id="likelihood-health-card" class="rounded-xl p-3.5 bg-[#F8F5EF] border border-[#DDD3C3] space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-[#34332F]">How likely buyers will buy</span>
+                  <span id="likelihood-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#89977B]/20 text-[#414A37]">
+                    Balanced (80%)
+                  </span>
+                </div>
+                <div class="w-full h-2.5 rounded-full bg-[#E9DFD0] overflow-hidden">
+                  <div id="likelihood-gauge-bar" class="h-full bg-[#414A37] rounded-full transition-all duration-300" style="width: 80%;"></div>
+                </div>
+                <p id="likelihood-desc-text" class="text-xs text-[#66625A] leading-snug">
+                  Recommended price: fair for you and welcoming for buyers.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <!-- Optional Payment Journey Timeline -->
+          <details class="bg-white rounded-2xl p-5 border border-[#DDD3C3]">
+            <summary class="flex items-center justify-between cursor-pointer font-serif font-bold text-sm text-[#34332F]">
+              <span>View Payment Steps (Optional)</span>
+              <svg class="details-chevron w-4 h-4 text-[#66625A] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div id="milestone-timeline-container" class="pt-4">
+              ${defaultTimelineHTML}
+            </div>
+          </details>
+
+        </div>
       </form>
 
-      <!-- CUSTOM ACCESSIBLE WARNING MODAL (Feature 1) -->
-      <div 
-        id="cost-deviation-modal" 
-        class="hidden fixed inset-0 z-50 bg-[#102F35]/70 backdrop-blur-xs flex items-center justify-center p-4"
-        role="alertdialog" 
-        aria-modal="true" 
-        aria-labelledby="modal-deviation-title" 
+      <!-- Material Cost Deviation Warning Modal -->
+      <div
+        id="cost-deviation-modal"
+        class="hidden fixed inset-0 z-50 bg-[#34332F]/60 backdrop-blur-xs flex items-center justify-center p-4"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="modal-deviation-title"
         aria-describedby="modal-deviation-desc"
         aria-hidden="true"
       >
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-[#E6E2D6] space-y-5 text-left transform transition-all">
-          
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-[#DDD3C3] space-y-5 text-left">
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-[#FBF1ED] border border-[#C95D35]/30 flex items-center justify-center text-xl flex-shrink-0">
+              <div class="w-11 h-11 rounded-xl bg-[#E9DFD0] flex items-center justify-center text-xl flex-shrink-0">
                 ⚠️
               </div>
               <div>
-                <h3 id="modal-deviation-title" data-modal-title class="text-base font-bold text-[#102F35] leading-tight font-serif">
-                  Material Cost Deviation Warning
+                <h3 id="modal-deviation-title" data-modal-title class="text-base font-bold text-[#34332F] font-serif">
+                  Check Material Cost
                 </h3>
-                <span data-modal-badge class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FBF1ED] text-[#C95D35] border border-[#C95D35]/20">
-                  +35% Deviation
+                <span data-modal-badge class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#E9DFD0] text-[#B9674B]">
+                  Higher than usual
                 </span>
               </div>
             </div>
-            
-            <button 
-              type="button" 
-              class="audio-btn p-1.5 rounded-full text-[#566C70] hover:text-[#102F35] hover:bg-[#FAF8F2]"
-              data-audio-text="Warning. Your entered material cost deviates by more than 30 percent from standard craft board market rates. Please review."
-              aria-label="Listen to warning dialog"
+
+            <button
+              type="button"
+              class="audio-btn p-1.5 rounded-full text-[#66625A] hover:text-[#34332F] hover:bg-[#F8F5EF] cursor-pointer"
+              data-audio-text="Please check your material cost. The amount you entered is quite different from the usual rate."
+              aria-label="Listen to warning"
             >
               🔊
             </button>
           </div>
 
-          <p id="modal-deviation-desc" data-modal-desc class="text-xs sm:text-sm text-[#566C70] leading-relaxed">
-            Your entered material cost deviates from the verified craft council baseline for this material.
+          <p id="modal-deviation-desc" data-modal-desc class="text-xs sm:text-sm text-[#66625A] leading-relaxed">
+            The material cost you entered looks different from the typical rate. You can keep your number or use the typical rate.
           </p>
 
-          <!-- Statistics comparison badge -->
-          <div class="p-3.5 rounded-xl bg-[#FAF8F2] border border-[#E6E2D6] grid grid-cols-2 gap-3 text-center text-xs">
+          <div class="p-3.5 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] grid grid-cols-2 gap-3 text-center text-xs">
             <div>
-              <span class="text-[10px] text-[#566C70] uppercase font-semibold">Standard Baseline</span>
-              <div data-modal-baseline class="text-sm font-bold text-[#102F35]">₹450</div>
+              <span class="text-[11px] text-[#66625A] font-medium">Usual Rate</span>
+              <div data-modal-baseline class="text-base font-bold text-[#34332F]">₹450</div>
             </div>
             <div>
-              <span class="text-[10px] text-[#566C70] uppercase font-semibold">Your Entered Cost</span>
-              <div data-modal-entered class="text-sm font-bold text-[#C95D35]">₹680</div>
+              <span class="text-[11px] text-[#66625A] font-medium">You Entered</span>
+              <div data-modal-entered class="text-base font-bold text-[#B9674B]">₹680</div>
             </div>
           </div>
 
-          <!-- Action buttons -->
-          <div class="flex flex-col sm:flex-row gap-3 pt-2">
-            <button 
-              type="button" 
-              id="modal-btn-adjust" 
-              data-modal-cancel
-              class="flex-1 py-3 px-4 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] font-bold text-xs transition-colors border border-[#E6E2D6]"
-            >
-              ← Adjust to Benchmark
+          <div class="flex flex-col sm:flex-row gap-3 pt-1">
+            <button type="button" id="modal-btn-adjust" data-modal-cancel class="flex-1 py-3 px-4 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] font-semibold text-xs border border-[#DDD3C3] cursor-pointer">
+              Use Usual Rate
             </button>
-            <button 
-              type="button" 
-              id="modal-btn-override" 
-              data-modal-confirm
-              class="flex-1 py-3 px-4 rounded-xl bg-[#174C43] hover:bg-[#0F3630] text-white font-bold text-xs shadow-xs transition-colors"
-            >
-              Keep My Cost (Override)
+            <button type="button" id="modal-btn-override" data-modal-confirm class="flex-1 py-3 px-4 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white font-semibold text-xs cursor-pointer">
+              Keep My Amount
             </button>
           </div>
-
         </div>
       </div>
 
@@ -675,20 +598,20 @@ export class MaterialPricingWizardController {
 
     if (sliderBadge) {
       const sign = breakdown.overridePercent > 0 ? "+" : "";
-      sliderBadge.textContent = breakdown.overridePercent === 0 
-        ? "0% (AI Default)" 
-        : `${sign}${breakdown.overridePercent}% Manual Override`;
+      sliderBadge.textContent = breakdown.overridePercent === 0
+        ? "0% (Recommended)"
+        : `${sign}${breakdown.overridePercent}% Adjusted`;
       sliderBadge.className = breakdown.overridePercent > 0
-        ? "px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 text-rose-900 border border-rose-300"
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E9DFD0] text-[#B9674B] border border-[#DDD3C3]"
         : breakdown.overridePercent < 0
-        ? "px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300"
-        : "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-stone-100 text-stone-700 border border-stone-300";
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#89977B]/20 text-[#414A37] border border-[#89977B]/40"
+        : "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3]";
     }
 
     if (ttsFinalBtn) {
       ttsFinalBtn.setAttribute(
         "data-audio-text",
-        `The final craft price is ${breakdown.finalAdjustedPrice} rupees.`
+        `Suggested selling price is ${breakdown.finalAdjustedPrice} rupees.`
       );
     }
 
@@ -699,21 +622,31 @@ export class MaterialPricingWizardController {
     const likelihoodDesc = document.getElementById("likelihood-desc-text");
 
     if (likelihoodBadge) {
-      likelihoodBadge.textContent = `${likelihood.title} (${likelihood.scorePercent}%)`;
-      likelihoodBadge.className = `px-2.5 py-0.5 rounded-full text-xs font-black ${likelihood.badgeBg} ${likelihood.badgeText}`;
+      likelihoodBadge.textContent = `${likelihood.state} (${likelihood.scorePercent}%)`;
+      likelihoodBadge.className = likelihood.state === "High"
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#89977B]/25 text-[#414A37]"
+        : likelihood.state === "Balanced"
+        ? "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E9DFD0] text-[#414A37]"
+        : "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#B9674B]/15 text-[#B9674B]";
     }
 
     if (likelihoodBar) {
       likelihoodBar.style.width = `${likelihood.scorePercent}%`;
       likelihoodBar.className = likelihood.state === "High"
-        ? "h-full bg-emerald-500 rounded-full transition-all duration-300"
+        ? "h-full bg-[#89977B] rounded-full transition-all duration-300"
         : likelihood.state === "Balanced"
-        ? "h-full bg-amber-500 rounded-full transition-all duration-300"
-        : "h-full bg-rose-500 rounded-full transition-all duration-300";
+        ? "h-full bg-[#414A37] rounded-full transition-all duration-300"
+        : "h-full bg-[#B9674B] rounded-full transition-all duration-300";
     }
 
     if (likelihoodDesc) {
       likelihoodDesc.textContent = likelihood.description;
+    }
+  }
+
+  private notifyUser(message: string, type: "success" | "warning" | "error" | "info" = "info"): void {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("artisan-toast", { detail: { message, type } }));
     }
   }
 
@@ -730,7 +663,7 @@ export class MaterialPricingWizardController {
 
     const productName = nameInput?.value.trim() || "";
     if (!productName) {
-      alert("Please enter a craft title for your listing.");
+      this.notifyUser("Please enter what you made before saving.", "warning");
       nameInput?.focus();
       return;
     }
@@ -760,20 +693,23 @@ export class MaterialPricingWizardController {
     const result = await this.syncManager.submitListing(payload);
 
     if (result.success) {
-      // Audio narration of success for village artisans
       this.audioAssistant.speak(
         result.isOffline
-          ? "Craft listing saved offline on your phone. It will automatically upload to the marketplace when your internet reconnects."
-          : "Success! Your craft listing is now live on the artisan marketplace."
+          ? "Saved safely on your device. It will sync automatically when your network returns."
+          : "Success! Your product and fair price have been saved."
       );
 
-      alert(result.message);
+      this.notifyUser(
+        result.isOffline
+          ? "Saved safely on this device. Will sync when online."
+          : `"${productName}" saved with fair price ₹${breakdown.finalAdjustedPrice.toLocaleString("en-IN")}.`,
+        "success"
+      );
 
-      // Advance visual timeline to "listed"
       this.setTimelineStatus("listed");
       nameInput.value = "";
     } else {
-      alert("Error: " + result.message);
+      this.notifyUser(result.message || "Could not save right now. Please try again.", "error");
     }
   }
 
@@ -802,21 +738,21 @@ export class MaterialPricingWizardController {
     if (!banner || !indicator || !text) return;
 
     if (isOnline) {
-      indicator.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
-      text.textContent = queuedCount > 0 
-        ? `Online • Flushing ${queuedCount} queued craft listing(s)...`
-        : "Online • Cloud Synchronization Active";
-      banner.className = "rounded-2xl p-3.5 bg-emerald-50 border border-emerald-200 flex items-center justify-between shadow-xs";
+      indicator.className = "w-2.5 h-2.5 rounded-full bg-[#414A37] pulse-subtle";
+      text.textContent = queuedCount > 0
+        ? `Online • Syncing ${queuedCount} saved item(s)...`
+        : "Saved & Ready";
+      banner.className = "rounded-xl px-3.5 py-2 bg-[#E9DFD0] border border-[#DDD3C3] flex items-center gap-2.5 text-xs";
     } else {
-      indicator.className = "w-3 h-3 rounded-full bg-rose-500 animate-pulse";
-      text.textContent = "Offline Mode Active • Form entries safely caching to device IndexedDB";
-      banner.className = "rounded-2xl p-3.5 bg-amber-50 border border-amber-300 flex items-center justify-between shadow-xs";
+      indicator.className = "w-2.5 h-2.5 rounded-full bg-[#B9674B] animate-pulse";
+      text.textContent = "Offline • Saving safely on device";
+      banner.className = "rounded-xl px-3.5 py-2 bg-[#F8F5EF] border border-[#B9674B]/50 flex items-center gap-2.5 text-xs";
     }
 
     if (badge) {
       if (queuedCount > 0) {
         badge.classList.remove("hidden");
-        badge.textContent = `${queuedCount} Queued`;
+        badge.textContent = `${queuedCount} Saved`;
       } else {
         badge.classList.add("hidden");
       }

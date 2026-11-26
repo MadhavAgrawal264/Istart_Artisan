@@ -2,37 +2,42 @@
 
 @layer base {
   :root {
-    /* Primary Heritage Palette */
-    --color-forest: #174c43;
-    --color-forest-dark: #0f3630;
-    --color-forest-light: #23655a;
-    --color-navy: #102f35;
-    --color-navy-dark: #091c20;
-    --color-sage: #6f9b88;
-    --color-sage-light: #eaf1ed;
-    --color-sage-dark: #517968;
-    --color-terracotta: #c95d35;
-    --color-terracotta-dark: #ab4b27;
-    --color-terracotta-light: #fbf1ed;
-    --color-ivory: #faf8f2;
-    --color-ivory-dark: #f0ece1;
-    --color-card: #ffffff;
-    --color-border: #e6e2d6;
-    --color-border-subtle: #f0ece1;
-    --color-text-main: #102f35;
-    --color-text-muted: #566c70;
+    /* Earth & Elegance Palette */
+    --color-bg-primary: #F8F5EF;
+    --color-accent-primary: #B9674B;
+    --color-accent-primary-hover: #A3553A;
+    --color-accent-secondary: #89977B;
+    --color-olive-dark: #414A37;
+    --color-olive-deep: #32392A;
+    --color-card-bg: #E9DFD0;
+    --color-card-soft: #F3ECE1;
+    --color-surface: #FFFFFF;
+    --color-border: #DDD3C3;
+    --color-border-subtle: #EAE2D5;
+    --color-text-main: #34332F;
+    --color-text-muted: #66625A;
   }
 
-  body {
-    background-color: var(--color-ivory);
-    color: var(--color-text-main);
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", sans-serif;
-    -webkit-tap-highlight-color: transparent;
+  html {
+    scroll-behavior: smooth;
     overflow-x: hidden;
   }
 
-  .font-serif {
-    font-family: 'Playfair Display', Georgia, Cambria, serif;
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-main);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Lora', Georgia, Cambria, serif;
+  }
+
+  .font-sans {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", sans-serif;
   }
 
   /* High Contrast Accessibility Mode */
@@ -41,71 +46,69 @@
     color: #ffffff !important;
   }
   body.high-contrast .bg-white,
-  body.high-contrast .bg-stone-50,
-  body.high-contrast .bg-amber-50,
-  body.high-contrast .bg-\[\#FAF8F2\],
-  body.high-contrast .bg-\[\#F0ECE1\] {
-    background-color: #121212 !important;
+  body.high-contrast .bg-\[\#F8F5EF\],
+  body.high-contrast .bg-\[\#E9DFD0\],
+  body.high-contrast .bg-\[\#F3ECE1\],
+  body.high-contrast .craft-card,
+  body.high-contrast .earth-card {
+    background-color: #141414 !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
   }
-  body.high-contrast .text-stone-600,
-  body.high-contrast .text-stone-500,
-  body.high-contrast .text-stone-700,
-  body.high-contrast .text-\[\#566C70\] {
-    color: #e2e8f0 !important;
+  body.high-contrast .text-\[\#66625A\],
+  body.high-contrast .text-\[\#34332F\],
+  body.high-contrast .text-\[\#414A37\] {
+    color: #f1f5f9 !important;
   }
-  body.high-contrast button {
-    border: 2px solid #facc15 !important;
+  body.high-contrast button,
+  body.high-contrast a {
+    outline: 1px solid #facc15;
   }
 
   /* Large Font Mode for Low-Literacy / Elderly Artisans */
   body.large-text {
-    font-size: 1.15rem;
+    font-size: 1.125rem;
+  }
+  body.large-text button,
+  body.large-text input,
+  body.large-text select,
+  body.large-text textarea {
+    font-size: 1.05rem;
   }
   body.large-text button {
-    font-size: 1.05rem;
-    padding-top: 0.85rem;
-    padding-bottom: 0.85rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 }
 
-/* Custom Heritage Utility Classes */
-.bg-forest { background-color: var(--color-forest); }
-.bg-forest-dark { background-color: var(--color-forest-dark); }
-.text-forest { color: var(--color-forest); }
-.border-forest { border-color: var(--color-forest); }
-
-.bg-navy { background-color: var(--color-navy); }
-.text-navy { color: var(--color-navy); }
-.border-navy { border-color: var(--color-navy); }
-
-.bg-sage { background-color: var(--color-sage); }
-.bg-sage-light { background-color: var(--color-sage-light); }
-.text-sage { color: var(--color-sage); }
-.text-sage-dark { color: var(--color-sage-dark); }
-.border-sage { border-color: var(--color-sage); }
-
-.bg-terracotta { background-color: var(--color-terracotta); }
-.bg-terracotta-light { background-color: var(--color-terracotta-light); }
-.text-terracotta { color: var(--color-terracotta); }
-.border-terracotta { border-color: var(--color-terracotta); }
-
-.bg-ivory { background-color: var(--color-ivory); }
-.bg-ivory-dark { background-color: var(--color-ivory-dark); }
-.border-ivory-dark { border-color: var(--color-ivory-dark); }
-
-/* Premium Subtle Shadow & Borders */
+/* Earth & Elegance Reusable Card & Navigation Styles */
 .craft-card {
-  background-color: #ffffff;
+  background-color: #FFFFFF;
   border: 1px solid var(--color-border);
-  box-shadow: 0 1px 3px 0 rgba(16, 47, 53, 0.04), 0 1px 2px -1px rgba(16, 47, 53, 0.03);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px -2px rgba(52, 51, 47, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .craft-card:hover {
-  border-color: #d1cbc0;
-  box-shadow: 0 4px 14px 0 rgba(16, 47, 53, 0.08);
+  border-color: var(--color-accent-secondary);
+  box-shadow: 0 8px 20px -4px rgba(52, 51, 47, 0.08);
+}
+
+.earth-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+}
+
+/* Active Sidebar & Mobile Navigation States */
+.nav-tab-btn.is-active {
+  background-color: var(--color-card-bg);
+  color: var(--color-olive-dark);
+  font-weight: 700;
+}
+
+.mobile-nav-btn.is-active {
+  color: var(--color-accent-primary);
+  font-weight: 700;
 }
 
 /* Minimal Custom Scrollbar */
@@ -121,30 +124,41 @@
 @keyframes audioWavePulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(23, 76, 67, 0.6);
+    box-shadow: 0 0 0 0 rgba(185, 103, 75, 0.45);
   }
   50% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 8px rgba(23, 76, 67, 0);
+    transform: scale(1.06);
+    box-shadow: 0 0 0 8px rgba(185, 103, 75, 0);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(23, 76, 67, 0);
+    box-shadow: 0 0 0 0 rgba(185, 103, 75, 0);
   }
 }
 
 .audio-active-pulse {
   animation: audioWavePulse 1.2s infinite ease-in-out !important;
-  background-color: var(--color-sage-light) !important;
-  color: var(--color-forest) !important;
-  border-color: var(--color-sage) !important;
+  background-color: var(--color-card-bg) !important;
+  color: var(--color-accent-primary) !important;
+  border-color: var(--color-accent-primary) !important;
 }
 
-/* Subtly animated ping for live indicators */
+/* Gentle live indicator */
 @keyframes gentlePulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.45; }
 }
 .pulse-subtle {
   animation: gentlePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Friendly native <details> chevron transition */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] summary .details-chevron {
+  transform: rotate(180deg);
 }

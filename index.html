@@ -3,1486 +3,1297 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Artisan - Traditional Craft Intelligence & Direct Trade</title>
-    <meta name="description" content="AI-Driven Market Linkage, Multimodal Cataloging, and Transparent Living Wages for Traditional Indian Artisans." />
-    <meta property="og:title" content="Artisan - AI Artisan Smart Catalog" />
-    <meta property="og:description" content="Empowering Rural Artisans with AI Cataloging & Fair Direct Markets." />
+    <title>Artisan — AI Smart Catalog & Direct Trade</title>
+    <meta name="description" content="Simple AI-powered catalog, fair pricing, and direct buyer connections for traditional Indian artisans." />
+    <meta property="og:title" content="Artisan — AI Smart Catalog" />
+    <meta property="og:description" content="Empowering Indian Artisans with AI Cataloging & Fair Direct Markets." />
     <meta property="og:type" content="website" />
-    
-    <!-- Google Fonts: Editorial Serif (Playfair Display) + Clean Sans (Plus Jakarta Sans) -->
+
+    <!-- Google Fonts: Lora (Headings) + Inter (Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+
     <link rel="icon" type="image/jpeg" href="./assets/artisan_logo.jpg" />
     <link rel="stylesheet" href="/src/index.css" />
   </head>
-  <body class="bg-[#FAF8F2] text-[#102F35] min-h-screen flex flex-col antialiased selection:bg-[#EAF1ED] selection:text-[#174C43]">
-    
-    <!-- Top Global Sticky Header -->
-    <header id="main-header" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E6E2D6] shadow-xs">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        
-        <!-- App Brand & Official Artisan Logo -->
-        <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-          <div class="relative w-11 h-11 rounded-xl bg-white p-1 shadow-xs border border-[#E6E2D6] group-hover:border-[#174C43] transition-colors flex items-center justify-center flex-shrink-0">
-            <img 
-              src="./assets/artisan_logo.jpg" 
-              alt="Artisan Logo" 
-              referrerpolicy="no-referrer"
-              class="w-full h-full object-contain rounded-lg"
-            />
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-serif font-bold text-[#102F35] text-xl tracking-tight" data-i18n="appTitle">Artisan</span>
-              <span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7] tracking-wide uppercase">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#174C43] animate-pulse"></span>
-                Direct Trade
-              </span>
-            </div>
-            <p class="text-[11px] font-medium text-[#566C70] hidden sm:block truncate max-w-xs" data-i18n="appSubtitle">
-              AI-Powered Bridge from Artisan to Market
-            </p>
-          </div>
+  <body class="bg-[#F8F5EF] text-[#34332F] min-h-screen flex antialiased selection:bg-[#E9DFD0] selection:text-[#414A37]">
+
+    <!-- ===================================================================== -->
+    <!-- DESKTOP SIDEBAR NAVIGATION (Earth & Elegance SaaS Shell)              -->
+    <!-- ===================================================================== -->
+    <aside class="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-[#DDD3C3] z-30">
+      <!-- Brand Header -->
+      <div class="px-5 py-5 border-b border-[#EAE2D5] flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <div class="w-10 h-10 rounded-xl bg-[#F8F5EF] p-1 border border-[#DDD3C3] flex items-center justify-center flex-shrink-0">
+          <img src="./assets/artisan_logo.jpg" alt="Artisan Logo" referrerpolicy="no-referrer" class="w-full h-full object-contain rounded-lg" />
         </div>
-
-        <!-- Controls: Language, Accessibility, Role Switcher -->
-        <div class="flex items-center gap-2.5">
-          <!-- Vernacular Language Dropdown -->
-          <div class="relative">
-            <select 
-              id="lang-select" 
-              class="text-xs font-semibold py-1.5 px-3 rounded-xl border border-[#E6E2D6] bg-white text-[#102F35] shadow-2xs focus:ring-2 focus:ring-[#174C43] focus:outline-none cursor-pointer"
-              title="Select Regional Language"
-            >
-              <!-- Populated dynamically -->
-            </select>
-          </div>
-
-          <!-- Role Toggle: Artisan / Buyer -->
-          <button 
-            id="btn-toggle-role" 
-            type="button" 
-            class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#FAF0EC] text-[#C95D35] border border-[#F3D5C8] flex items-center gap-1.5 shadow-2xs hover:bg-[#F5E6E0] transition-colors"
-            title="Toggle between Artisan & Buyer View"
-          >
-            <span>🎨</span> <span data-i18n="artisanMode">Artisan Mode</span>
-          </button>
-
-          <!-- High Contrast Toggle -->
-          <button 
-            id="btn-toggle-contrast" 
-            type="button" 
-            class="w-8 h-8 rounded-xl border border-[#E6E2D6] bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] flex items-center justify-center text-xs font-bold transition-colors"
-            title="Toggle High Contrast Mode"
-          >
-            ◐
-          </button>
-
-          <!-- Text Size Scaler -->
-          <button 
-            id="btn-toggle-font" 
-            type="button" 
-            class="w-8 h-8 rounded-xl border border-[#E6E2D6] bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] flex items-center justify-center text-xs font-bold transition-colors"
-            title="Toggle Large Font for Accessibility"
-          >
-            aA
-          </button>
+        <div class="min-w-0">
+          <div class="font-serif font-bold text-[#34332F] text-lg leading-tight truncate" data-i18n="appTitle">Artisan</div>
+          <div class="text-[11px] font-medium text-[#66625A] truncate">Smart Craft Catalog</div>
         </div>
-
       </div>
 
-      <!-- Main Navigation Tabs -->
-      <nav class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 sm:gap-4 overflow-x-auto hide-scrollbar border-t border-[#F0ECE1] text-xs sm:text-sm font-medium">
-        <button 
-          data-tab="home" 
-          class="nav-tab-btn py-3 px-2 text-[#174C43] font-bold border-b-2 border-[#174C43] flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>🏠</span> <span>Home</span>
+      <!-- Primary Sidebar Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
+        <button data-tab="home" class="nav-tab-btn is-active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#34332F] hover:bg-[#F8F5EF] transition-colors text-left cursor-pointer">
+          <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          <span data-i18n="navDashboard">Dashboard</span>
         </button>
-        <button 
-          data-tab="catalog" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>🏺</span> <span data-i18n="navCatalog">Craft Catalog</span>
+
+        <button data-tab="catalog" class="nav-tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+          <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span data-i18n="navProducts">Products</span>
         </button>
-        <button 
-          data-tab="cataloging" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>✨</span> <span data-i18n="navAddProduct">Smart Cataloging</span>
+
+        <button data-tab="cataloging" class="nav-tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+          <svg class="w-4.5 h-4.5 flex-shrink-0 text-[#B9674B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          <span data-i18n="navAddShort">Add Product</span>
         </button>
-        <button 
-          data-tab="ai-advisor" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors group"
-        >
-          <span>🤖</span> <span>AI Artisan Advisor</span>
-          <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7]">Live AI</span>
+
+        <button data-tab="ai-advisor" class="nav-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+          <span class="flex items-center gap-3">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span data-i18n="navAdvisor">AI Advisor</span>
+          </span>
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E9DFD0] text-[#414A37]">Helper</span>
         </button>
-        <button 
-          data-tab="studio" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>👩‍🎨</span> <span data-i18n="navStudio">My Studio</span>
+
+        <button data-tab="pricing-engine" class="nav-tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+          <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 7h14"/><path d="m5 7-2 7a3 3 0 0 0 6 0L7 7"/><path d="m19 7-2 7a3 3 0 0 0 6 0l-2-7"/></svg>
+          <span data-i18n="navPricing">Fair Pricing</span>
         </button>
-        <button 
-          data-tab="inquiries" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>📬</span> <span data-i18n="navInquiries">Buyer Leads</span>
+
+        <button data-tab="inquiries" class="nav-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+          <span class="flex items-center gap-3">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span data-i18n="navInquiries">Buyer Enquiries</span>
+          </span>
+          <span id="sidebar-inquiries-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#B9674B] text-white">2</span>
         </button>
-        <button 
-          data-tab="pricing-engine" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>⚖️</span> <span>Fair Pricing & Trust</span>
-          <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#FAF0EC] text-[#C95D35] border border-[#F3D5C8]">Offline</span>
-        </button>
-        <button 
-          data-tab="artisan-profile" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>👤</span> <span>Artisan Profile</span>
-        </button>
-        <button 
-          data-tab="settings" 
-          class="nav-tab-btn py-3 px-2 text-[#102F35]/70 hover:text-[#174C43] border-b-2 border-transparent flex items-center gap-1.5 whitespace-nowrap transition-colors"
-        >
-          <span>⚙️</span> <span>Settings</span>
-        </button>
-      </nav>
-    </header>
 
-    <!-- Main Content Canvas -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pb-24">
-      
-      <!-- ===================================================================== -->
-      <!-- VIEW 1: HOME (EDITORIAL HERO, CATEGORIES & IMPACT)                    -->
-      <!-- ===================================================================== -->
-      <section id="view-home" class="tab-view space-y-12">
-        
-        <!-- Editorial Hero Section -->
-        <div class="rounded-3xl bg-[#174C43] text-white p-8 sm:p-12 lg:p-16 shadow-lg relative overflow-hidden border border-[#174C43]/50">
-          <!-- Subtle Heritage Ambient Lights -->
-          <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#6F9B88]/20 blur-3xl pointer-events-none"></div>
-          <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-[#C95D35]/15 blur-3xl pointer-events-none"></div>
-          
-          <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-            <div class="max-w-2xl flex-1 text-center lg:text-left">
-              
-              <!-- Direct Trade Badge -->
-              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-[#FAF8F2] text-xs font-semibold mb-5 backdrop-blur-xs border border-white/15 shadow-2xs">
-                <span>✨</span> <span>Direct Trade • Handcrafted Heritage • Zero Middlemen</span>
-              </div>
-              
-              <!-- Heading -->
-              <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15] mb-4" data-i18n="heroHeading">
-                Empowering Rural Artisans with AI Cataloging & Fair Direct Markets
-              </h1>
-              
-              <!-- Subtitle -->
-              <p class="text-[#FAF8F2]/80 text-sm sm:text-base leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0" data-i18n="heroDesc">
-                Snap a craft photo or speak in your mother tongue. Multimodal AI identifies materials, writes generational stories, calculates honest living wages, and connects master craftspeople directly to patrons.
-              </p>
-              
-              <!-- Action CTAs -->
-              <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3">
-                <button 
-                  id="hero-cta-browse" 
-                  type="button"
-                  class="px-6 py-3 rounded-2xl bg-[#FAF8F2] hover:bg-white text-[#174C43] font-bold text-xs sm:text-sm shadow-sm transition-all transform active:scale-95"
-                >
-                  <span data-i18n="btnBrowseCatalog">Explore Artisan Crafts</span> →
-                </button>
-                <button 
-                  id="hero-cta-catalog" 
-                  type="button"
-                  class="px-6 py-3 rounded-2xl bg-[#C95D35] hover:bg-[#B34E28] text-white font-bold text-xs sm:text-sm shadow-sm transition-all transform active:scale-95 flex items-center gap-2"
-                >
-                  <span>📷</span> <span data-i18n="btnStartCataloging">Smart Cataloging Wizard</span>
-                </button>
-                <button 
-                  id="hero-cta-ai-advisor" 
-                  type="button"
-                  class="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-medium text-xs sm:text-sm backdrop-blur-xs border border-white/20 transition-colors flex items-center gap-2"
-                >
-                  <span>🤖</span> <span>Artisan AI Advisor</span>
-                </button>
-                <button 
-                  id="hero-cta-pricing" 
-                  type="button"
-                  class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-[#FAF8F2] font-medium text-xs sm:text-sm backdrop-blur-xs border border-white/20 transition-colors flex items-center gap-2"
-                >
-                  <span>⚖️</span> <span>Fair Pricing Engine</span>
-                </button>
-              </div>
+        <div class="pt-4 mt-4 border-t border-[#EAE2D5]">
+          <div class="px-3.5 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#66625A]">Workshop</div>
 
-            </div>
+          <button data-tab="studio" class="nav-tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span data-i18n="navStudio">My Studio</span>
+          </button>
 
-            <!-- Authentic Official Logo Showcase Banner -->
-            <div class="hidden lg:flex flex-col items-center justify-center p-6 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl flex-shrink-0 text-center max-w-[240px]">
-              <div class="w-36 h-36 rounded-2xl bg-white p-3 shadow-md flex items-center justify-center mb-3">
-                <img 
-                  src="./assets/artisan_logo.jpg" 
-                  alt="Artisan" 
-                  referrerpolicy="no-referrer"
-                  class="w-full h-full object-contain rounded-xl"
-                />
-              </div>
-              <span class="text-xs font-bold tracking-widest text-[#FAF8F2] uppercase font-serif">ARTISAN</span>
-              <span class="text-[11px] text-[#FAF8F2]/75 mt-1 leading-snug">AI-Powered Bridge from Artisan to Market</span>
-            </div>
-          </div>
-        </div>
+          <button data-tab="artisan-profile" class="nav-tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span data-i18n="navProfile">Artisan Profile</span>
+          </button>
 
-        <!-- Value Pillars Bar -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-[#EAF1ED] text-[#174C43] flex items-center justify-center text-lg flex-shrink-0">
-              🛡️
-            </div>
-            <div>
-              <h4 class="font-bold text-[#102F35] text-sm mb-0.5">100% Living Wage</h4>
-              <p class="text-xs text-[#566C70] leading-snug">Transparent cost-plus formula ensures fair compensation for every craft hour.</p>
-            </div>
-          </div>
-
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-[#FAF0EC] text-[#C95D35] flex items-center justify-center text-lg flex-shrink-0">
-              ✦
-            </div>
-            <div>
-              <h4 class="font-bold text-[#102F35] text-sm mb-0.5">GI Certified Heritage</h4>
-              <p class="text-xs text-[#566C70] leading-snug">Authentic verification of regional Geographical Indications & traditional practices.</p>
-            </div>
-          </div>
-
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-[#EAF1ED] text-[#174C43] flex items-center justify-center text-lg flex-shrink-0">
-              💬
-            </div>
-            <div>
-              <h4 class="font-bold text-[#102F35] text-sm mb-0.5">Direct Trade Orders</h4>
-              <p class="text-xs text-[#566C70] leading-snug">Zero middlemen cuts. Conscious buyers connect directly via WhatsApp and phone.</p>
-            </div>
-          </div>
-
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-[#FAF8F2] text-[#6F9B88] border border-[#E6E2D6] flex items-center justify-center text-lg flex-shrink-0">
-              📶
-            </div>
-            <div>
-              <h4 class="font-bold text-[#102F35] text-sm mb-0.5">Village Offline Sync</h4>
-              <p class="text-xs text-[#566C70] leading-snug">Fully functional without internet in remote craft clusters with automatic sync.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Explore Artisan Crafts: 4 Heritage Category Cards -->
-        <div>
-          <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
-            <div>
-              <span class="text-xs font-bold text-[#C95D35] uppercase tracking-wider">Curated Collections</span>
-              <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#102F35] mt-0.5">Explore Artisan Crafts</h2>
-            </div>
-            <p class="text-xs sm:text-sm text-[#566C70] max-w-md">
-              Discover authentic handmade creations directly from master craftspeople across Indian craft clusters.
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <!-- Category 1: Ceramics & Pottery -->
-            <div 
-              data-home-category="Ceramics & Pottery" 
-              class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col"
-            >
-              <div class="aspect-[4/3] bg-[#FAF8F2] overflow-hidden relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=600&auto=format&fit=crop&q=80" 
-                  alt="Ceramics & Pottery" 
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
-                <span class="absolute top-3 left-3 bg-white/90 text-[#174C43] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#CFDFD7]">
-                  GI Heritage
-                </span>
-              </div>
-              <div class="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 class="font-serif font-bold text-[#102F35] text-base group-hover:text-[#174C43] transition-colors mb-1">
-                    Ceramics & Pottery
-                  </h3>
-                  <p class="text-xs text-[#566C70] line-clamp-2">
-                    Jaipur turquoise Blue Pottery, non-clay quartz vases, and traditional clay terracottas.
-                  </p>
-                </div>
-                <div class="mt-3 pt-3 border-t border-[#F0ECE1] flex items-center justify-between text-xs font-bold text-[#174C43]">
-                  <span>Explore Collection</span>
-                  <span class="group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Category 2: Paintings & Folk Art -->
-            <div 
-              data-home-category="Paintings & Folk Art" 
-              class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col"
-            >
-              <div class="aspect-[4/3] bg-[#FAF8F2] overflow-hidden relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80" 
-                  alt="Paintings & Folk Art" 
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
-                <span class="absolute top-3 left-3 bg-white/90 text-[#C95D35] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F3D5C8]">
-                  Folk Tradition
-                </span>
-              </div>
-              <div class="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 class="font-serif font-bold text-[#102F35] text-base group-hover:text-[#174C43] transition-colors mb-1">
-                    Paintings & Folk Art
-                  </h3>
-                  <p class="text-xs text-[#566C70] line-clamp-2">
-                    Mithila Madhubani natural pigment paintings, Pattachitra scrolls, and tribal Warli stories.
-                  </p>
-                </div>
-                <div class="mt-3 pt-3 border-t border-[#F0ECE1] flex items-center justify-between text-xs font-bold text-[#174C43]">
-                  <span>Explore Collection</span>
-                  <span class="group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Category 3: Wooden Toys & Carvings -->
-            <div 
-              data-home-category="Wooden Toys & Carvings" 
-              class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col"
-            >
-              <div class="aspect-[4/3] bg-[#FAF8F2] overflow-hidden relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=600&auto=format&fit=crop&q=80" 
-                  alt="Wooden Toys & Carvings" 
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
-                <span class="absolute top-3 left-3 bg-white/90 text-[#174C43] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#CFDFD7]">
-                  100% Non-Toxic
-                </span>
-              </div>
-              <div class="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 class="font-serif font-bold text-[#102F35] text-base group-hover:text-[#174C43] transition-colors mb-1">
-                    Wooden Toys & Carvings
-                  </h3>
-                  <p class="text-xs text-[#566C70] line-clamp-2">
-                    Channapatna natural vegetable lacquer turned wooden toys and fine Saharanpur carvings.
-                  </p>
-                </div>
-                <div class="mt-3 pt-3 border-t border-[#F0ECE1] flex items-center justify-between text-xs font-bold text-[#174C43]">
-                  <span>Explore Collection</span>
-                  <span class="group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Category 4: Metalcraft & Bell Metal -->
-            <div 
-              data-home-category="Metalcraft & Bell Metal" 
-              class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col"
-            >
-              <div class="aspect-[4/3] bg-[#FAF8F2] overflow-hidden relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=600&auto=format&fit=crop&q=80" 
-                  alt="Metalcraft & Bell Metal" 
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
-                <span class="absolute top-3 left-3 bg-white/90 text-[#C95D35] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F3D5C8]">
-                  4,000 Yr Process
-                </span>
-              </div>
-              <div class="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 class="font-serif font-bold text-[#102F35] text-base group-hover:text-[#174C43] transition-colors mb-1">
-                    Metalcraft & Bell Metal
-                  </h3>
-                  <p class="text-xs text-[#566C70] line-clamp-2">
-                    Bastar Dhokra ancient lost-wax brass castings, bell metal musical instruments, and sculptures.
-                  </p>
-                </div>
-                <div class="mt-3 pt-3 border-t border-[#F0ECE1] flex items-center justify-between text-xs font-bold text-[#174C43]">
-                  <span>Explore Collection</span>
-                  <span class="group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- "Why Artisan" Impact Section -->
-        <div class="rounded-3xl bg-white border border-[#E6E2D6] p-8 sm:p-12 shadow-2xs">
-          <div class="max-w-3xl mb-8">
-            <span class="text-xs font-bold text-[#6F9B88] uppercase tracking-wider">Direct Heritage Commerce</span>
-            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#102F35] mt-1 mb-3">
-              Why Artisan Matters: Dignity, Craft Lineage & Living Wages
-            </h2>
-            <p class="text-xs sm:text-sm text-[#566C70] leading-relaxed">
-              Traditional Indian crafts represent over 4,000 years of cultural heritage, yet rural artisans typically earn less than 15% of the final retail price paid by urban consumers. Artisan eliminates intermediaries through multimodal AI and direct village linkages.
-            </p>
-          </div>
-
-          <!-- Impact Metrics Grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-[#F0ECE1] text-center">
-            <div>
-              <div class="font-serif text-3xl sm:text-4xl font-extrabold text-[#174C43]">₹0</div>
-              <div class="text-xs font-semibold text-[#102F35] mt-1">Middlemen Cuts</div>
-              <div class="text-[11px] text-[#566C70] mt-0.5">100% direct trade</div>
-            </div>
-
-            <div>
-              <div class="font-serif text-3xl sm:text-4xl font-extrabold text-[#C95D35]">4,000+</div>
-              <div class="text-xs font-semibold text-[#102F35] mt-1">Years Preserved</div>
-              <div class="text-[11px] text-[#566C70] mt-0.5">Indigenous craft traditions</div>
-            </div>
-
-            <div>
-              <div class="font-serif text-3xl sm:text-4xl font-extrabold text-[#174C43]">9</div>
-              <div class="text-xs font-semibold text-[#102F35] mt-1">Indian Languages</div>
-              <div class="text-[11px] text-[#566C70] mt-0.5">Vernacular voice accessibility</div>
-            </div>
-
-            <div>
-              <div class="font-serif text-3xl sm:text-4xl font-extrabold text-[#6F9B88]">85%+</div>
-              <div class="text-xs font-semibold text-[#102F35] mt-1">Artisan Share</div>
-              <div class="text-[11px] text-[#566C70] mt-0.5">Retained by craft creator</div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 2: CRAFT CATALOG                                                 -->
-      <!-- ===================================================================== -->
-      <section id="view-catalog" class="tab-view hidden space-y-6">
-        
-        <!-- Filter and Search Bar -->
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs space-y-3">
-          <div class="flex flex-col sm:flex-row gap-3">
-            
-            <!-- Search -->
-            <div class="relative flex-1">
-              <span class="absolute left-3.5 top-2.5 text-[#566C70]">🔍</span>
-              <input 
-                type="text" 
-                id="catalog-search-input" 
-                placeholder="Search crafts by art form, state, material, or keyword..."
-                data-i18n-placeholder="searchPlaceholder"
-                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E6E2D6] focus:outline-none focus:ring-2 focus:ring-[#174C43] text-xs sm:text-sm bg-[#FAF8F2]"
-              />
-            </div>
-
-            <!-- Category Filter -->
-            <select 
-              id="catalog-category-filter" 
-              class="py-2.5 px-3 rounded-xl border border-[#E6E2D6] text-xs sm:text-sm bg-[#FAF8F2] text-[#102F35] focus:outline-none focus:ring-2 focus:ring-[#174C43]"
-            >
-              <!-- Dynamic Categories -->
-            </select>
-
-            <!-- State Filter -->
-            <select 
-              id="catalog-state-filter" 
-              class="py-2.5 px-3 rounded-xl border border-[#E6E2D6] text-xs sm:text-sm bg-[#FAF8F2] text-[#102F35] focus:outline-none focus:ring-2 focus:ring-[#174C43]"
-            >
-              <!-- Dynamic States -->
-            </select>
-          </div>
-
-          <!-- Max Price Slider & Results Count -->
-          <div class="flex items-center justify-between gap-4 pt-3 border-t border-[#F0ECE1] text-xs text-[#566C70]">
-            <div class="flex items-center gap-3 flex-1 max-w-xs">
-              <span class="font-medium whitespace-nowrap" data-i18n="filterPrice">Max Price:</span>
-              <input 
-                type="range" 
-                id="catalog-price-slider" 
-                min="500" 
-                max="10000" 
-                step="250" 
-                value="10000" 
-                class="w-full accent-[#174C43]"
-              />
-              <span id="catalog-price-val" class="font-bold text-[#174C43] min-w-[70px]">₹10,000</span>
-            </div>
-            <div id="catalog-results-count" class="font-semibold text-[#102F35] text-right">
-              4 Craft Items
-            </div>
-          </div>
-        </div>
-
-        <!-- Products Grid -->
-        <div id="catalog-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <!-- Populated dynamically by renderCatalog() -->
-        </div>
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 3: SMART CATALOGING WIZARD                                       -->
-      <!-- ===================================================================== -->
-      <section id="view-cataloging" class="tab-view hidden max-w-4xl mx-auto space-y-6">
-        
-        <!-- Step Indicator Header -->
-        <div class="bg-white p-4 rounded-2xl border border-[#E6E2D6] shadow-2xs flex items-center justify-between gap-2 overflow-x-auto hide-scrollbar">
-          <div data-step="1" class="step-indicator-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#174C43] text-white whitespace-nowrap shadow-2xs">
-            1. Photo & Voice
-          </div>
-          <span class="text-[#E6E2D6]">→</span>
-          <div data-step="2" class="step-indicator-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FAF8F2] text-[#566C70] border border-[#E6E2D6] whitespace-nowrap">
-            2. AI Detection
-          </div>
-          <span class="text-[#E6E2D6]">→</span>
-          <div data-step="3" class="step-indicator-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FAF8F2] text-[#566C70] border border-[#E6E2D6] whitespace-nowrap">
-            3. Studio Photo
-          </div>
-          <span class="text-[#E6E2D6]">→</span>
-          <div data-step="4" class="step-indicator-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FAF8F2] text-[#566C70] border border-[#E6E2D6] whitespace-nowrap">
-            4. Smart Pricing
-          </div>
-          <span class="text-[#E6E2D6]">→</span>
-          <div data-step="5" class="step-indicator-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FAF8F2] text-[#566C70] border border-[#E6E2D6] whitespace-nowrap">
-            5. Approve & Publish
-          </div>
-        </div>
-
-        <!-- WIZARD STEP 1: PHOTO CAPTURE & VOICE NOTE -->
-        <div id="wizard-step-1" class="wizard-step-panel bg-white p-6 sm:p-8 rounded-3xl border border-[#E6E2D6] shadow-2xs space-y-6">
-          <div>
-            <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35] mb-1" data-i18n="step1Title">1. Capture or Select Craft Photo</h2>
-            <p class="text-xs sm:text-sm text-[#566C70]" data-i18n="step1Subtitle">Take a clear photo with your camera or select an image file</p>
-          </div>
-
-          <!-- Camera Stream Container (Hidden by default) -->
-          <div id="camera-container" class="hidden rounded-2xl overflow-hidden bg-black relative aspect-[4/3] max-w-md mx-auto shadow-inner">
-            <video id="camera-stream" autoplay playsinline class="w-full h-full object-cover"></video>
-            <!-- Camera Viewfinder Overlay -->
-            <div class="absolute inset-6 border-2 border-dashed border-white/50 rounded-xl pointer-events-none"></div>
-            <!-- Bottom Camera Controls -->
-            <div class="absolute bottom-4 inset-x-0 flex items-center justify-center gap-4">
-              <button 
-                id="btn-shutter-snap" 
-                type="button" 
-                class="w-14 h-14 rounded-full bg-white border-4 border-[#174C43] flex items-center justify-center text-xl shadow-lg active:scale-90 transition-transform"
-                title="Capture Craft Photo"
-              >
-                📸
-              </button>
-              <button 
-                id="btn-close-camera" 
-                type="button" 
-                class="px-3.5 py-1.5 rounded-xl bg-black/60 text-white text-xs backdrop-blur-xs font-medium"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-
-          <!-- Capture & Upload Options -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button 
-              id="btn-open-camera" 
-              type="button" 
-              class="p-6 rounded-2xl border-2 border-dashed border-[#CFDFD7] hover:border-[#174C43] bg-[#EAF1ED]/40 hover:bg-[#EAF1ED]/80 flex flex-col items-center justify-center text-center gap-2 group transition-all"
-            >
-              <span class="text-3xl group-hover:scale-110 transition-transform">📷</span>
-              <span class="font-bold text-[#174C43] text-sm" data-i18n="btnTakePhoto">Open Camera</span>
-              <span class="text-[11px] text-[#566C70]">Use device camera for instant craft photo</span>
-            </button>
-
-            <label 
-              id="file-dropzone" 
-              class="p-6 rounded-2xl border-2 border-dashed border-[#E6E2D6] hover:border-[#174C43] bg-[#FAF8F2] hover:bg-white flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all"
-            >
-              <input type="file" id="product-file-input" accept="image/*" class="hidden" />
-              <span class="text-3xl">📁</span>
-              <span class="font-bold text-[#102F35] text-sm" data-i18n="btnUploadFile">Upload Photo</span>
-              <span class="text-[11px] text-[#566C70]">Drag & drop or choose from gallery</span>
-            </label>
-          </div>
-
-          <!-- 1-Click Sample Demos for Instant Testing -->
-          <div class="pt-2">
-            <div class="text-xs font-bold text-[#566C70] mb-2.5">⚡ Instant 1-Click Demo Crafts:</div>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" data-craft="madhubani" class="sample-craft-btn px-3 py-1.5 rounded-xl bg-[#FAF8F2] hover:bg-[#FAF0EC] text-[#102F35] hover:text-[#C95D35] text-xs font-medium border border-[#E6E2D6]">
-                Demo: Madhubani Painting
-              </button>
-              <button type="button" data-craft="channapatna" class="sample-craft-btn px-3 py-1.5 rounded-xl bg-[#FAF8F2] hover:bg-[#FAF0EC] text-[#102F35] hover:text-[#C95D35] text-xs font-medium border border-[#E6E2D6]">
-                Demo: Channapatna Toy
-              </button>
-              <button type="button" data-craft="bluepottery" class="sample-craft-btn px-3 py-1.5 rounded-xl bg-[#FAF8F2] hover:bg-[#FAF0EC] text-[#102F35] hover:text-[#C95D35] text-xs font-medium border border-[#E6E2D6]">
-                Demo: Blue Pottery Vase
-              </button>
-              <button type="button" data-craft="dhokra" class="sample-craft-btn px-3 py-1.5 rounded-xl bg-[#FAF8F2] hover:bg-[#FAF0EC] text-[#102F35] hover:text-[#C95D35] text-xs font-medium border border-[#E6E2D6]">
-                Demo: Dhokra Brass Craft
-              </button>
-            </div>
-          </div>
-
-          <!-- Uploaded Preview -->
-          <div id="photo-preview-container" class="hidden border border-[#E6E2D6] rounded-2xl p-4 bg-[#FAF8F2] flex items-center gap-4">
-            <img id="uploaded-photo-preview" class="w-20 h-20 object-cover rounded-xl shadow-xs border border-white" alt="Selected craft preview" />
-            <div class="flex-1">
-              <div class="text-xs font-bold text-[#174C43] flex items-center gap-1.5">
-                <span>✓</span> Photo Loaded Successfully
-              </div>
-              <p class="text-xs text-[#566C70] mt-0.5">Ready for multimodal analysis and background studio enhancement.</p>
-            </div>
-          </div>
-
-          <!-- Voice Input Assistant -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6] space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-[#102F35] flex items-center gap-1.5">
-                <span>🎙️</span> <span data-i18n="voiceAssistant">Voice Assistant</span> (Speak in Hindi / Regional Language)
-              </label>
-              <span id="voice-pulse-status" class="text-xs font-bold text-[#C95D35] hidden animate-pulse"></span>
-            </div>
-            <p class="text-xs text-[#566C70]" data-i18n="voicePromptHelp">Describe materials, technique, and time taken in your own words:</p>
-            
-            <div class="flex gap-2">
-              <textarea 
-                id="voice-input-text" 
-                rows="2" 
-                placeholder="e.g., 'Yeh Bastar ki brass ghanti hai, bees ghante lage hain, wild bee wax aur river clay use hua hai...'"
-                data-i18n-placeholder="voicePlaceholder"
-                class="flex-1 text-xs sm:text-sm p-3 rounded-xl border border-[#E6E2D6] focus:outline-none focus:ring-2 focus:ring-[#174C43] bg-white leading-relaxed"
-              ></textarea>
-              <button 
-                id="btn-voice-record" 
-                type="button" 
-                class="px-4 py-2 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-2xs transition-transform active:scale-95"
-              >
-                <span>🎙️</span> <span data-i18n="tapToSpeak">Tap to Speak</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- AI Trigger Button -->
-          <button 
-            id="btn-trigger-ai-analysis" 
-            type="button" 
-            class="w-full py-4 rounded-2xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
-          >
-            <span>✨</span> <span data-i18n="btnAnalyzeAI">Analyze Craft with Gemini AI</span>
+          <button data-tab="settings" class="nav-tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#66625A] hover:bg-[#F8F5EF] hover:text-[#34332F] transition-colors text-left cursor-pointer">
+            <svg class="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09c-.658.003-1.25.396-1.51 1z"/></svg>
+            <span data-i18n="navSettings">Settings</span>
           </button>
         </div>
+      </nav>
 
-        <!-- AI Loading Overlay -->
-        <div id="ai-analysis-loading" class="hidden p-12 text-center bg-white rounded-3xl border border-[#E6E2D6] shadow-2xs space-y-4">
-          <div class="w-12 h-12 border-4 border-[#174C43] border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <h3 class="font-serif font-bold text-[#102F35] text-lg">AI Multimodal Processing...</h3>
-          <p class="text-xs sm:text-sm text-[#566C70] max-w-md mx-auto" data-i18n="analyzingCraft">
-            AI is detecting craft tradition, materials, color palette & writing cultural story...
-          </p>
+      <!-- Sidebar Support Card -->
+      <div class="p-3.5">
+        <div class="rounded-2xl bg-[#E9DFD0] p-4 border border-[#DDD3C3] text-center space-y-2">
+          <div class="w-9 h-9 rounded-full bg-white text-[#414A37] flex items-center justify-center mx-auto border border-[#DDD3C3]">
+            <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          </div>
+          <div class="font-serif font-bold text-sm text-[#34332F]">Need Help?</div>
+          <p class="text-[11px] text-[#66625A] leading-snug">Ask our AI Artisan Advisor in Hindi or English for pricing & craft tips.</p>
+          <button type="button" data-tab="ai-advisor" class="nav-tab-btn w-full py-2 rounded-xl bg-white hover:bg-[#F8F5EF] text-[#414A37] text-xs font-semibold border border-[#DDD3C3] transition-colors cursor-pointer">
+            Open AI Advisor
+          </button>
         </div>
+      </div>
+    </aside>
 
-        <!-- WIZARD STEP 2: AI DETECTION & CULTURAL NARRATIVE -->
-        <div id="wizard-step-2" class="wizard-step-panel hidden bg-white p-6 sm:p-8 rounded-3xl border border-[#E6E2D6] shadow-2xs space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35]" data-i18n="step2Title">2. AI Craft Detection & Cultural Narrative</h2>
-              <p class="text-xs text-[#566C70]">Multimodal recognition with deterministic living-wage pricing</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <span id="res-confidence-badge" class="px-3 py-1 rounded-full bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7] text-xs font-bold flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#174C43]"></span>
-                <span id="res-confidence-text">92% High Confidence</span>
-              </span>
-              <span id="res-gi-tag" class="px-3 py-1 rounded-full bg-[#FAF0EC] text-[#C95D35] border border-[#F3D5C8] text-xs font-bold">
-                ✦ GI Status: <span id="res-gi-status-text">Estimated Unverified</span>
-              </span>
-            </div>
-          </div>
+    <!-- ===================================================================== -->
+    <!-- MAIN SHELL (TOP UTILITY HEADER + CONTENT + MOBILE NAV)                -->
+    <!-- ===================================================================== -->
+    <div class="flex-1 lg:pl-64 flex flex-col min-w-0">
 
-          <!-- Guardrail Notice Banner -->
-          <div id="res-guardrail-banner" class="hidden p-4 rounded-2xl bg-[#FAF0EC] border border-[#F3D5C8] text-[#102F35] text-xs flex items-start gap-3">
-            <span class="text-lg flex-shrink-0 text-[#C95D35]">⚠️</span>
-            <div class="space-y-1">
-              <div class="font-bold text-[#C95D35]" id="res-guardrail-title">SHG Human Verification Recommended</div>
-              <p class="text-[#566C70] leading-relaxed" id="res-guardrail-desc">Visual and material analysis confidence is below 0.85. Verification by an SHG lead is recommended before publishing.</p>
-              <div id="res-verification-notice" class="text-[11px] text-[#C95D35] font-semibold"></div>
+      <!-- Top Utility Bar -->
+      <header id="main-header" class="sticky top-0 z-20 bg-[#F8F5EF]/95 backdrop-blur-sm border-b border-[#DDD3C3]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+
+          <!-- Mobile Brand -->
+          <div class="flex items-center gap-2.5 lg:hidden min-w-0">
+            <img src="./assets/artisan_logo.jpg" alt="Artisan Logo" referrerpolicy="no-referrer" class="w-9 h-9 rounded-xl object-contain bg-white p-0.5 border border-[#DDD3C3] flex-shrink-0" />
+            <div class="min-w-0">
+              <span class="font-serif font-bold text-[#34332F] text-base block leading-tight truncate" data-i18n="appTitle">Artisan</span>
+              <span class="text-[10px] text-[#66625A] block truncate">Direct Craft Market</span>
             </div>
           </div>
 
-          <!-- Attribute Badges Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6]">
-              <div class="text-[#566C70] uppercase font-bold text-[10px] tracking-wider mb-1" data-i18n="categoryLabel">Craft Category</div>
-              <div id="res-category" class="font-bold text-[#102F35] text-sm">--</div>
-            </div>
-            <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6]">
-              <div class="text-[#566C70] uppercase font-bold text-[10px] tracking-wider mb-1" data-i18n="materialsLabel">Materials Detected</div>
-              <div id="res-materials" class="flex flex-wrap gap-1 font-semibold text-[#102F35]">--</div>
-            </div>
-            <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6]">
-              <div class="text-[#566C70] uppercase font-bold text-[10px] tracking-wider mb-1" data-i18n="colorsLabel">Color Palette</div>
-              <div id="res-colors" class="flex flex-wrap gap-1 font-semibold text-[#102F35]">--</div>
-            </div>
-            <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6]">
-              <div class="text-[#566C70] uppercase font-bold text-[10px] tracking-wider mb-1" data-i18n="tagsLabel">Craft Tags & Techniques</div>
-              <div id="res-tags" class="flex flex-wrap gap-1 font-semibold text-[#102F35]">--</div>
-            </div>
-          </div>
-
-          <!-- Cultural Story Box -->
-          <div class="p-5 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6]">
-            <div class="font-bold text-[#102F35] text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <span>📜</span> <span>Cultural & Heritage Narrative</span>
-            </div>
-            <p id="res-story" class="text-xs sm:text-sm text-[#102F35]/80 leading-relaxed italic"></p>
-          </div>
-
-          <!-- Navigation -->
-          <div class="flex items-center justify-between pt-4 border-t border-[#F0ECE1]">
-            <button type="button" data-prev="1" class="wizard-prev-btn px-4 py-2 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] font-semibold text-xs border border-[#E6E2D6]">
-              ← Back
-            </button>
-            <button type="button" data-next="3" class="wizard-next-btn px-6 py-2.5 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs shadow-2xs">
-              Next: Studio Photo Enhancement →
-            </button>
-          </div>
-        </div>
-
-        <!-- WIZARD STEP 3: STUDIO BACKGROUND & ENHANCEMENT -->
-        <div id="wizard-step-3" class="wizard-step-panel hidden bg-white p-6 sm:p-8 rounded-3xl border border-[#E6E2D6] shadow-2xs space-y-6">
-          <div>
-            <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35]" data-i18n="step3Title">3. Studio Photo Enhancement</h2>
-            <p class="text-xs text-[#566C70]" data-i18n="step3Subtitle">Choose a clean e-commerce studio background to increase buyer value</p>
-          </div>
-
-          <!-- Studio Style Selector Pills -->
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <button type="button" data-style="studio_white" class="bg-style-btn p-3 rounded-2xl border border-[#E6E2D6] text-center ring-2 ring-[#174C43] bg-white hover:bg-[#FAF8F2] transition-all">
-              <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 mx-auto mb-1.5"></div>
-              <span class="text-xs font-bold block text-[#102F35]" data-i18n="bgStudioWhite">Studio White</span>
-            </button>
-            <button type="button" data-style="warm_terracotta" class="bg-style-btn p-3 rounded-2xl border border-[#E6E2D6] text-center bg-white hover:bg-[#FAF8F2] transition-all">
-              <div class="w-8 h-8 rounded-full bg-orange-100 border border-orange-400 mx-auto mb-1.5"></div>
-              <span class="text-xs font-bold block text-[#102F35]" data-i18n="bgWarmTerracotta">Warm Terracotta</span>
-            </button>
-            <button type="button" data-style="silk_velvet" class="bg-style-btn p-3 rounded-2xl border border-[#E6E2D6] text-center bg-white hover:bg-[#FAF8F2] transition-all">
-              <div class="w-8 h-8 rounded-full bg-indigo-100 border border-indigo-400 mx-auto mb-1.5"></div>
-              <span class="text-xs font-bold block text-[#102F35]" data-i18n="bgSilkVelvet">Royal Silk</span>
-            </button>
-            <button type="button" data-style="raw_canvas" class="bg-style-btn p-3 rounded-2xl border border-[#E6E2D6] text-center bg-white hover:bg-[#FAF8F2] transition-all">
-              <div class="w-8 h-8 rounded-full bg-amber-100 border border-amber-400 mx-auto mb-1.5"></div>
-              <span class="text-xs font-bold block text-[#102F35]" data-i18n="bgRawCanvas">Raw Canvas</span>
-            </button>
-            <button type="button" data-style="transparent" class="bg-style-btn p-3 rounded-2xl border border-[#E6E2D6] text-center bg-white hover:bg-[#FAF8F2] transition-all">
-              <div class="w-8 h-8 rounded-full bg-stone-200 border border-stone-400 mx-auto mb-1.5"></div>
-              <span class="text-xs font-bold block text-[#102F35]" data-i18n="bgTransparent">Cutout (PNG)</span>
-            </button>
-          </div>
-
-          <!-- Live Studio Preview Box -->
-          <div class="relative aspect-[4/3] max-w-md mx-auto rounded-2xl overflow-hidden border border-[#E6E2D6] shadow-sm bg-[#FAF8F2]">
-            <img id="enhanced-photo-preview" class="w-full h-full object-cover" alt="Enhanced Craft Preview" />
-          </div>
-
-          <!-- Navigation -->
-          <div class="flex items-center justify-between pt-4 border-t border-[#F0ECE1]">
-            <button type="button" data-prev="2" class="wizard-prev-btn px-4 py-2 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] font-semibold text-xs border border-[#E6E2D6]">
-              ← Back
-            </button>
-            <button type="button" data-next="4" class="wizard-next-btn px-6 py-2.5 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs shadow-2xs">
-              Next: Smart Fair Pricing →
-            </button>
-          </div>
-        </div>
-
-        <!-- WIZARD STEP 4: SMART FAIR-PRICING CALCULATOR -->
-        <div id="wizard-step-4" class="wizard-step-panel hidden bg-white p-6 sm:p-8 rounded-3xl border border-[#E6E2D6] shadow-2xs space-y-6">
-          <div>
-            <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35]" data-i18n="step4Title">4. Smart Fair-Pricing Calculator</h2>
-            <p class="text-xs text-[#566C70]" data-i18n="step4Subtitle">AI calculates a fair living wage so middle-men cannot undervalue your hard labor</p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <!-- Inputs Column -->
-            <div class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold text-[#102F35] mb-1" data-i18n="matCostLabel">Raw Materials Cost (₹)</label>
-                <input type="number" id="input-calc-material" value="320" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-sm font-semibold bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-[#102F35] mb-1" data-i18n="laborHoursLabel">Handcrafting Hours</label>
-                  <input type="number" id="input-calc-hours" value="16" step="0.5" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-sm font-semibold bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-[#102F35] mb-1" data-i18n="hourlyWageLabel">Artisan Hourly Wage (₹/hr)</label>
-                  <input type="number" id="input-calc-wage" value="85" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-sm font-semibold bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-[#102F35] mb-1" data-i18n="overheadLabel">Packaging & Overhead (₹)</label>
-                  <input type="number" id="input-calc-overhead" value="120" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-sm font-semibold bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-[#102F35] mb-1" data-i18n="marginLabel">Artisan Margin (%)</label>
-                  <input type="number" id="input-calc-margin" value="25" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-sm font-semibold bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Pricing Breakdown Output Card -->
-            <div class="p-6 rounded-2xl bg-[#EAF1ED]/50 border border-[#CFDFD7] flex flex-col justify-between">
-              <div class="space-y-4">
-                <div>
-                  <div class="text-[11px] text-[#174C43] font-bold uppercase tracking-wider" data-i18n="fairPriceCalculated">Recommended Fair Selling Price</div>
-                  <div id="disp-fair-price" class="text-3xl font-serif font-black text-[#174C43] mt-0.5">₹2,250</div>
-                </div>
-
-                <div class="pt-3 border-t border-[#CFDFD7] flex items-center justify-between text-xs">
-                  <span class="text-[#566C70]" data-i18n="marketBenchmark">Typical Urban Retail Benchmark</span>
-                  <span id="disp-market-benchmark" class="font-bold text-[#566C70] line-through">₹3,600</span>
-                </div>
-
-                <div class="flex items-center justify-between text-xs">
-                  <span class="text-[#566C70]" data-i18n="artisanEarnings">Your Direct Artisan Take-Home</span>
-                  <span id="disp-artisan-earnings" class="font-bold text-[#174C43]">₹1,950 (86%)</span>
-                </div>
-              </div>
-
-              <div class="mt-4 p-3 rounded-xl bg-white text-[11px] text-[#102F35] border border-[#CFDFD7] flex items-center gap-2">
-                <span>🛡️</span>
-                <span>Fair-trade formula ensures 100% of the calculated living wage is retained by you.</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Navigation -->
-          <div class="flex items-center justify-between pt-4 border-t border-[#F0ECE1]">
-            <button type="button" data-prev="3" class="wizard-prev-btn px-4 py-2 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] font-semibold text-xs border border-[#E6E2D6]">
-              ← Back
-            </button>
-            <button type="button" data-next="5" class="wizard-next-btn px-6 py-2.5 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs shadow-2xs">
-              Next: Review & Approve →
-            </button>
-          </div>
-        </div>
-
-        <!-- WIZARD STEP 5: REVIEW, EDIT & PUBLISH -->
-        <div id="wizard-step-5" class="wizard-step-panel hidden bg-white p-6 sm:p-8 rounded-3xl border border-[#E6E2D6] shadow-2xs space-y-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35]" data-i18n="step5Title">5. Review, Edit & Approve</h2>
-              <p class="text-xs text-[#566C70]" data-i18n="step5Subtitle">You are the master craftsman. Inspect and adjust all AI details before publishing.</p>
-            </div>
-            <div class="text-right">
-              <span class="text-[10px] text-[#566C70] uppercase font-semibold">Approved Fair Price</span>
-              <div id="review-final-price-badge" class="font-serif font-bold text-2xl text-[#174C43]">₹2,250</div>
-            </div>
-          </div>
-
-          <!-- Editable Fields -->
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-[#102F35] mb-1" data-i18n="productTitleLabel">Product Listing Title</label>
-              <input type="text" id="input-review-title" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-sm font-semibold bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
-            </div>
-
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-bold text-[#102F35]" data-i18n="productDescLabel">Craft Story & Description</label>
-                <!-- Audio TTS & Translate -->
-                <button 
-                  type="button" 
-                  id="btn-tts-read-story" 
-                  class="text-xs text-[#174C43] font-semibold flex items-center gap-1 hover:underline"
-                  title="Audio Read-Aloud for low literacy"
-                >
-                  <span>🔊</span> <span data-i18n="readAloud">Listen to Story (Audio)</span>
-                </button>
-              </div>
-              <textarea id="input-review-desc" rows="5" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-xs sm:text-sm bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43] leading-relaxed"></textarea>
-            </div>
-
-            <!-- Regional Translation Bar -->
-            <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <span class="font-semibold text-[#102F35]">Translate to Another Language:</span>
-              <div class="flex items-center gap-2">
-                <select id="review-translate-lang" class="py-1.5 px-3 rounded-xl border border-[#E6E2D6] bg-white text-xs text-[#102F35]">
-                  <option value="hi">Hindi (हिन्दी)</option>
-                  <option value="bn">Bengali (বাংলা)</option>
-                  <option value="mr">Marathi (मराठी)</option>
-                  <option value="ta">Tamil (தமிழ்)</option>
-                  <option value="te">Telugu (తెలుగు)</option>
-                  <option value="gu">Gujarati (ગુજરાતી)</option>
-                  <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                  <option value="od">Odia (ଓଡ଼ିଆ)</option>
-                  <option value="en">English</option>
-                </select>
-                <button type="button" id="btn-translate-review" class="px-3.5 py-1.5 rounded-xl bg-[#174C43] text-white font-bold text-xs hover:bg-[#102F35] transition-colors">
-                  Translate
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Navigation & Final Approval Button -->
-          <div class="flex items-center justify-between pt-4 border-t border-[#F0ECE1]">
-            <button type="button" data-prev="4" class="wizard-prev-btn px-4 py-2 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] font-semibold text-xs border border-[#E6E2D6]">
-              ← Back
-            </button>
-            <button 
-              id="btn-publish-craft" 
-              type="button" 
-              class="px-6 py-3 rounded-2xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-sm shadow-sm flex items-center gap-2 transition-transform active:scale-95"
-            >
-              <span>✓</span> <span data-i18n="btnApprovePublish">Approve & Publish to Global Catalog</span>
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 4: AI ARTISAN ADVISOR (CLEAN CHAT LAYOUT)                         -->
-      <!-- ===================================================================== -->
-      <section id="view-ai-advisor" class="tab-view hidden max-w-4xl mx-auto space-y-4">
-        <!-- AI Advisor Card Container -->
-        <div class="bg-white rounded-3xl border border-[#E6E2D6] shadow-sm overflow-hidden flex flex-col h-[750px]">
-          
-          <!-- Chat Header -->
-          <div class="p-4 sm:p-5 bg-[#174C43] text-white flex items-center justify-between border-b border-[#174C43]">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-xl shadow-inner">
-                🤖
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h2 class="font-serif font-bold text-base sm:text-lg">Artisan AI Advisor</h2>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7] flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#174C43] animate-ping"></span> Live Gemini
-                  </span>
-                </div>
-                <p class="text-xs text-[#FAF8F2]/80">Cultural curator, fair pricing specialist & craft mentor</p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <button 
-                id="btn-clear-ai-chat" 
-                title="Clear conversation"
-                class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[#FAF8F2] text-xs font-medium transition-colors flex items-center gap-1"
-              >
-                <span>🧹</span> <span class="hidden sm:inline">Clear</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Quick Suggestion Prompts Carousel -->
-          <div class="bg-[#FAF8F2] border-b border-[#E6E2D6] px-4 py-2.5 overflow-x-auto hide-scrollbar flex items-center gap-2 text-xs">
-            <span class="font-bold text-[#174C43] flex-shrink-0 flex items-center gap-1">
-              <span>💡</span> Ideas:
-            </span>
-            <button class="ai-prompt-chip px-3 py-1 rounded-full bg-white hover:bg-[#EAF1ED] text-[#102F35] border border-[#E6E2D6] whitespace-nowrap transition-all shadow-2xs font-medium cursor-pointer" data-prompt="How do I calculate a fair price for a handmade Madhubani painting that took 15 hours?">
-              💰 Fair Price for 15hr Madhubani
-            </button>
-            <button class="ai-prompt-chip px-3 py-1 rounded-full bg-white hover:bg-[#EAF1ED] text-[#102F35] border border-[#E6E2D6] whitespace-nowrap transition-all shadow-2xs font-medium cursor-pointer" data-prompt="Does Channapatna wooden craft have an official GI Tag? What is its history with Tipu Sultan?">
-              🏷️ Channapatna GI Tag & History
-            </button>
-            <button class="ai-prompt-chip px-3 py-1 rounded-full bg-white hover:bg-[#EAF1ED] text-[#102F35] border border-[#E6E2D6] whitespace-nowrap transition-all shadow-2xs font-medium cursor-pointer" data-prompt="Write an emotional artisan heritage story for a hand-carved Dhokra brass bull figurine for conscious luxury buyers.">
-              📜 Heritage Story for Dhokra Brass
-            </button>
-            <button class="ai-prompt-chip px-3 py-1 rounded-full bg-white hover:bg-[#EAF1ED] text-[#102F35] border border-[#E6E2D6] whitespace-nowrap transition-all shadow-2xs font-medium cursor-pointer" data-prompt="How can I explain to an urban customer why authentic handloom costs more than mill-made fabric?">
-              🛡️ Defending Artisan Wages
-            </button>
-            <button class="ai-prompt-chip px-3 py-1 rounded-full bg-white hover:bg-[#EAF1ED] text-[#102F35] border border-[#E6E2D6] whitespace-nowrap transition-all shadow-2xs font-medium cursor-pointer" data-prompt="What are the essential care instructions for Jaipur Blue Pottery ceramics?">
-              🏺 Blue Pottery Care Guide
-            </button>
-          </div>
-
-          <!-- Chat Messages Area -->
-          <div id="ai-chat-messages" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-[#FAF8F2]/40">
-            <!-- Initial AI Greeting Message -->
-            <div class="flex items-start gap-3 max-w-2xl">
-              <div class="w-8 h-8 rounded-xl bg-[#174C43] text-white flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-2xs">
-                🤖
-              </div>
-              <div class="bg-white p-4 rounded-2xl rounded-tl-xs border border-[#E6E2D6] shadow-2xs text-xs sm:text-sm text-[#102F35] space-y-2.5 leading-relaxed">
-                <div class="font-serif font-bold text-[#174C43] flex items-center gap-1.5">
-                  <span>Namaste & Welcome! I am your Artisan AI Advisor.</span>
-                </div>
-                <p>
-                  I am trained to support traditional Indian craftspeople, self-help groups (SHGs), and conscious craft lovers. You can ask me anything about:
-                </p>
-                <ul class="list-disc list-inside space-y-1 text-[#566C70] text-xs">
-                  <li><strong>Fair Wage Calculation:</strong> Transparent cost-plus living wages based on your crafting hours and materials.</li>
-                  <li><strong>Geographical Indications (GI):</strong> Authentic validation of Indian crafts (Madhubani, Channapatna, Pashmina, etc.).</li>
-                  <li><strong>Cultural Storytelling:</strong> Compelling product stories to connect directly with conscious global patrons.</li>
-                  <li><strong>Buyer Negotiation:</strong> How to defend handmade value against industrial price comparisons.</li>
-                </ul>
-                <p class="text-[#566C70] text-xs pt-1">
-                  Click any prompt suggestion above or type your question below in English, Hindi, or your regional language!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Typing / Loading Indicator -->
-          <div id="ai-chat-loading" class="hidden px-6 py-2.5 bg-[#FAF8F2] border-t border-[#E6E2D6] flex items-center gap-2 text-xs text-[#174C43] font-medium">
-            <span class="w-2 h-2 rounded-full bg-[#174C43] animate-ping"></span>
-            <span>Artisan AI is researching traditional craft archives & calculating...</span>
-          </div>
-
-          <!-- Chat Input Controls -->
-          <div class="p-3 sm:p-4 bg-white border-t border-[#E6E2D6]">
-            <form id="ai-chat-form" class="flex items-center gap-2">
-              <button 
-                id="btn-ai-chat-mic" 
-                type="button" 
-                title="Voice input (Speech to Text)"
-                class="w-10 h-10 rounded-2xl bg-[#FAF8F2] hover:bg-[#EAF1ED] text-[#174C43] border border-[#E6E2D6] flex items-center justify-center text-base transition-all flex-shrink-0"
-              >
-                🎙️
-              </button>
-              <input 
-                id="ai-chat-input" 
-                type="text" 
-                autocomplete="off"
-                placeholder="Ask about pricing, craft history, GI tags, materials, or artisan stories..." 
-                class="flex-1 py-2.5 px-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6] focus:outline-none focus:ring-2 focus:ring-[#174C43] text-xs sm:text-sm text-[#102F35]"
-              />
-              <button 
-                id="btn-ai-chat-send" 
-                type="submit" 
-                class="px-4 sm:px-5 py-2.5 rounded-2xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs sm:text-sm shadow-2xs flex items-center gap-1.5 transition-all flex-shrink-0 active:scale-95"
-              >
-                <span>Send</span> <span>➤</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 5: MY STUDIO (CREATOR WORKSPACE)                                 -->
-      <!-- ===================================================================== -->
-      <section id="view-studio" class="tab-view hidden space-y-6">
-        
-        <!-- Artisan Profile Banner -->
-        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#E6E2D6] shadow-2xs flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <img 
-            id="artisan-profile-avatar"
-            src="./assets/sitadevi_profile.jpg" 
-            alt="Sitadevi Devi" 
-            referrerpolicy="no-referrer"
-            class="w-24 h-24 rounded-2xl object-cover shadow-xs border-2 border-[#174C43]"
-          />
-          <div class="flex-1 text-center sm:text-left">
-            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1.5">
-              <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35]">Sitadevi Devi</h2>
-              <span class="px-2.5 py-0.5 rounded-full bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7] text-xs font-semibold">
-                ✓ Verified Heritage Artisan
-              </span>
-              <span class="px-2.5 py-0.5 rounded-full bg-[#FAF0EC] text-[#C95D35] border border-[#F3D5C8] text-xs font-semibold">
-                ✦ GI Tag Certified
-              </span>
-            </div>
-            <p class="text-xs text-[#566C70] mb-2 font-medium">Ranti Village, Madhubani, Bihar • 28 Years Experience • Traditional Mithila Folk Art</p>
-            <p class="text-xs text-[#102F35]/80 max-w-xl mb-4 leading-relaxed">
-              Passed down through 4 generations of Mithila women, specializing in Bharni and Kachni natural dye paintings on handmade cotton paper.
-            </p>
-            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-              <button 
-                id="btn-studio-add-craft" 
-                type="button" 
-                class="px-4 py-2 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white text-xs font-bold shadow-2xs flex items-center gap-1.5 transition-colors"
-              >
-                <span>➕</span> <span>Add New Craft</span>
-              </button>
-              <button 
-                id="btn-studio-view-profile" 
-                type="button" 
-                class="px-4 py-2 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] border border-[#E6E2D6] text-xs font-semibold transition-colors"
-              >
-                View Public Profile
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Studio Metrics -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs">
-            <div class="text-[#566C70] text-xs uppercase font-semibold tracking-wider" data-i18n="totalListings">Active Craft Listings</div>
-            <div id="studio-listings-count" class="font-serif text-3xl font-extrabold text-[#174C43] mt-1">1</div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs">
-            <div class="text-[#566C70] text-xs uppercase font-semibold tracking-wider" data-i18n="totalInquiries">Buyer Leads Received</div>
-            <div id="studio-inquiries-count" class="font-serif text-3xl font-extrabold text-[#C95D35] mt-1">2</div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs">
-            <div class="text-[#566C70] text-xs uppercase font-semibold tracking-wider" data-i18n="fairTradeScore">Living Wage Retained</div>
-            <div class="font-serif text-3xl font-extrabold text-[#174C43] mt-1">100%</div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl border border-[#E6E2D6] shadow-2xs">
-            <div class="text-[#566C70] text-xs uppercase font-semibold tracking-wider">Village Trust Rating</div>
-            <div class="font-serif text-3xl font-extrabold text-[#6F9B88] mt-1">4.9 / 5.0</div>
-          </div>
-        </div>
-
-        <!-- Recent Inquiries Preview -->
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif font-bold text-lg text-[#102F35]">Direct Buyer Leads</h3>
-            <span class="text-xs text-[#566C70]">Zero intermediary commissions</span>
-          </div>
-          <div id="studio-inquiries-list" class="space-y-3">
-            <!-- Populated dynamically -->
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 6: BUYER LEADS (CRM MANAGEMENT)                                  -->
-      <!-- ===================================================================== -->
-      <section id="view-inquiries" class="tab-view hidden space-y-6">
-        <div>
-          <span class="text-xs font-bold text-[#6F9B88] uppercase tracking-wider">Direct Patron Linkage</span>
-          <h2 class="font-serif text-2xl font-bold text-[#102F35]" data-i18n="navInquiries">Buyer Leads & Inquiries</h2>
-          <p class="text-xs text-[#566C70]">Conscious consumers and bulk retail buyers connecting directly with your workshop</p>
-        </div>
-
-        <!-- Inquiries List Container (Shares data with studio) -->
-        <div class="space-y-4">
-          <div class="p-4 rounded-2xl bg-[#EAF1ED]/40 border border-[#CFDFD7] text-xs text-[#174C43] flex items-center justify-between">
-            <span>🛡️ All buyer contacts are verified with authentic WhatsApp / Phone credentials. Zero commission deductions.</span>
-            <span class="font-bold">Direct Settlement: UPI & Bank</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 7: FAIR PRICING & VILLAGE TRUST ENGINE                           -->
-      <!-- ===================================================================== -->
-      <section id="view-pricing-engine" class="tab-view hidden space-y-6">
-        <!-- The MaterialPricingWizardController mounts here -->
-        <div id="material-pricing-wizard-mount"></div>
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 9: MASTER ARTISAN PROFILE VIEW                                   -->
-      <!-- ===================================================================== -->
-      <section id="view-artisan-profile" class="tab-view hidden space-y-8">
-        <!-- Master Artisan Hero Card -->
-        <div class="bg-white rounded-3xl border border-[#E6E2D6] p-8 shadow-sm flex flex-col md:flex-row items-center md:items-start gap-8">
-          <div class="w-32 h-32 rounded-3xl overflow-hidden border-2 border-[#174C43] shadow-md flex-shrink-0">
-            <img 
-              src="./assets/sitadevi_profile.jpg" 
-              alt="Sitadevi Devi" 
-              class="w-full h-full object-cover" 
+          <!-- Desktop Quick Search Bar -->
+          <div class="hidden md:flex items-center flex-1 max-w-md relative">
+            <svg class="w-4 h-4 text-[#66625A] absolute left-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input
+              id="header-quick-search"
+              type="text"
+              placeholder="Search products, states, or craft types..."
+              class="w-full pl-10 pr-4 py-2 rounded-xl bg-white border border-[#DDD3C3] text-xs sm:text-sm text-[#34332F] placeholder-[#66625A] focus:outline-none focus:ring-2 focus:ring-[#89977B]"
             />
           </div>
-          <div class="flex-1 text-center md:text-left space-y-3">
-            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
-              <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#102F35]">Sitadevi Devi</h2>
-              <span class="px-3 py-1 rounded-full bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7] text-xs font-bold">
-                ✓ Master Artisan
-              </span>
-              <span class="px-3 py-1 rounded-full bg-[#FAF0EC] text-[#C95D35] border border-[#F3D5C8] text-xs font-bold">
-                ✦ GI Mithila Certified
-              </span>
-            </div>
-            <p class="text-xs sm:text-sm text-[#566C70] font-medium">
-              Ranti Village, Madhubani District, Bihar • 28 Years Experience • 4th Generation Craftswoman
-            </p>
-            <p class="text-xs sm:text-sm text-[#102F35]/85 leading-relaxed max-w-2xl">
-              Sitadevi Devi is a celebrated Mithila artist practicing ancestral Bharni and Kachni styles. Her works use bamboo twigs and natural mineral dyes extracted from local marigold, soot, turmeric, and neem gum on handmade cotton rag paper.
-            </p>
-            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
-              <button 
-                id="artisan-profile-whatsapp" 
-                type="button" 
-                class="px-4 py-2.5 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white text-xs font-bold shadow-2xs flex items-center gap-2 transition-colors"
-              >
-                <span>💬</span> <span>Inquire on WhatsApp</span>
-              </button>
-              <button 
-                id="artisan-profile-call" 
-                type="button" 
-                class="px-4 py-2.5 rounded-xl bg-[#FAF8F2] hover:bg-[#F0ECE1] text-[#102F35] border border-[#E6E2D6] text-xs font-semibold flex items-center gap-1.5 transition-colors"
-              >
-                <span>📞</span> <span>Call Directly</span>
-              </button>
-              <span class="px-3 py-2 rounded-xl bg-[#FAF8F2] text-xs font-medium text-[#566C70] border border-[#E6E2D6]">
-                UPI: sitadevi@upi
-              </span>
-            </div>
+
+          <!-- Controls: Language, Role, Accessibility & Quick Studio Links -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <select
+              id="lang-select"
+              class="text-xs font-semibold py-2 px-2.5 rounded-xl border border-[#DDD3C3] bg-white text-[#34332F] focus:ring-2 focus:ring-[#89977B] focus:outline-none cursor-pointer"
+              title="Choose your language"
+            ></select>
+
+            <button
+              id="btn-toggle-role"
+              type="button"
+              class="px-3 py-2 rounded-xl text-xs font-semibold bg-[#E9DFD0] text-[#414A37] border border-[#DDD3C3] flex items-center gap-1.5 hover:bg-[#DDD3C3]/60 transition-colors cursor-pointer"
+              title="Switch between Artisan Seller view and Buyer view"
+            >
+              <span>Artisan Mode</span>
+            </button>
+
+            <button
+              id="btn-toggle-contrast"
+              type="button"
+              class="w-9 h-9 rounded-xl border border-[#DDD3C3] bg-white hover:bg-[#E9DFD0]/50 text-[#34332F] flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+              title="High Contrast Mode for bright sunlight"
+              aria-label="Toggle High Contrast"
+            >
+              ◐
+            </button>
+
+            <button
+              id="btn-toggle-font"
+              type="button"
+              class="w-9 h-9 rounded-xl border border-[#DDD3C3] bg-white hover:bg-[#E9DFD0]/50 text-[#34332F] flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+              title="Larger Text Size"
+              aria-label="Toggle Larger Text"
+            >
+              aA
+            </button>
+
+            <button
+              type="button"
+              data-tab="settings"
+              class="nav-tab-btn lg:hidden w-9 h-9 rounded-xl border border-[#DDD3C3] bg-white text-[#34332F] flex items-center justify-center cursor-pointer"
+              title="Settings & Studio"
+              aria-label="Open Settings"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09c-.658.003-1.25.396-1.51 1z"/></svg>
+            </button>
           </div>
         </div>
+      </header>
 
-        <!-- Master Artisan Craft Portfolio -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
+      <!-- Main Content Area -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 lg:pb-12">
+
+        <!-- =================================================================== -->
+        <!-- VIEW 1: DASHBOARD (EARTH & ELEGANCE STUDIO HOME)                    -->
+        <!-- =================================================================== -->
+        <section id="view-home" class="tab-view space-y-8">
+
+          <!-- Welcome Header + Primary Add Product CTA -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span class="text-xs font-bold text-[#C95D35] uppercase tracking-wider">Catalog</span>
-              <h3 class="font-serif text-xl sm:text-2xl font-bold text-[#102F35]">Creations by Sitadevi Devi</h3>
+              <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F] tracking-tight">
+                Namaste, <span id="dash-greeting-name">Sitadevi Devi</span>
+              </h1>
+              <p class="text-sm text-[#66625A] mt-1" data-i18n="dashWelcomeSub">
+                Manage your handcrafted products, set fair prices, and connect directly with buyers.
+              </p>
             </div>
-            <span class="text-xs text-[#566C70]">100% Direct Fair Price</span>
+            <button
+              id="hero-cta-catalog"
+              type="button"
+              class="min-h-[48px] px-6 py-3 rounded-2xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-sm shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+            >
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              <span data-i18n="dashAddProduct">Add New Product</span>
+            </button>
           </div>
 
-          <div id="artisan-profile-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Populated by renderArtisanProfilePage() -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================================================================== -->
-      <!-- VIEW 10: SETTINGS & ACCESSIBILITY                                     -->
-      <!-- ===================================================================== -->
-      <section id="view-settings" class="tab-view hidden max-w-3xl mx-auto space-y-6">
-        <div>
-          <span class="text-xs font-bold text-[#6F9B88] uppercase tracking-wider">Preferences</span>
-          <h2 class="font-serif text-2xl font-bold text-[#102F35]">Settings & Village Accessibility</h2>
-          <p class="text-xs text-[#566C70]">Customize vernacular language, high contrast, and offline sync preferences</p>
-        </div>
-
-        <!-- Language Preference Card -->
-        <div class="bg-white p-6 rounded-2xl border border-[#E6E2D6] shadow-2xs space-y-3">
-          <h3 class="font-serif font-bold text-base text-[#102F35] flex items-center gap-2">
-            <span>🌐</span> <span>Vernacular Language Preference</span>
-          </h3>
-          <p class="text-xs text-[#566C70]">Select your preferred regional mother tongue for all app interfaces and voice prompts.</p>
-          <select id="settings-lang-select" class="w-full p-2.5 rounded-xl border border-[#E6E2D6] bg-[#FAF8F2] text-xs font-semibold text-[#102F35] focus:ring-2 focus:ring-[#174C43]">
-            <!-- Dynamic options -->
-          </select>
-        </div>
-
-        <!-- Accessibility Controls Card -->
-        <div class="bg-white p-6 rounded-2xl border border-[#E6E2D6] shadow-2xs space-y-4">
-          <h3 class="font-serif font-bold text-base text-[#102F35] flex items-center gap-2">
-            <span>♿</span> <span>Accessibility & Low-Vision Features</span>
-          </h3>
-          <div class="space-y-3 text-xs">
-            <label class="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F2] border border-[#E6E2D6] cursor-pointer">
-              <div>
-                <div class="font-bold text-[#102F35]">High Contrast Mode</div>
-                <div class="text-[#566C70]">Maximum legibility for outdoor sunlight and low-vision artisans</div>
+          <!-- Clean 4-Card Summary Row (Not Overcrowded) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="rounded-2xl bg-white p-5 border border-[#DDD3C3] shadow-xs">
+              <div class="flex items-center justify-between text-xs font-medium text-[#66625A] mb-2">
+                <span data-i18n="dashTotalProducts">Total Products</span>
+                <span class="w-8 h-8 rounded-xl bg-[#F8F5EF] text-[#414A37] flex items-center justify-center border border-[#EAE2D5]">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/></svg>
+                </span>
               </div>
-              <input type="checkbox" id="settings-contrast-toggle" class="w-5 h-5 accent-[#174C43]" />
+              <div id="dash-total-products" class="font-serif text-3xl font-bold text-[#34332F]">4</div>
+              <div class="text-[11px] text-[#66625A] mt-1">In your catalog</div>
+            </div>
+
+            <div class="rounded-2xl bg-white p-5 border border-[#DDD3C3] shadow-xs">
+              <div class="flex items-center justify-between text-xs font-medium text-[#66625A] mb-2">
+                <span data-i18n="dashPublishedProducts">Published Products</span>
+                <span class="w-8 h-8 rounded-xl bg-[#89977B]/15 text-[#414A37] flex items-center justify-center">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+              </div>
+              <div id="dash-published-products" class="font-serif text-3xl font-bold text-[#414A37]">4</div>
+              <div class="text-[11px] text-[#89977B] font-medium mt-1">Visible to buyers</div>
+            </div>
+
+            <div class="rounded-2xl bg-white p-5 border border-[#DDD3C3] shadow-xs">
+              <div class="flex items-center justify-between text-xs font-medium text-[#66625A] mb-2">
+                <span data-i18n="dashPendingApprovals">Pending Approvals</span>
+                <span class="w-8 h-8 rounded-xl bg-[#E9DFD0] text-[#B9674B] flex items-center justify-center">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+              </div>
+              <div id="dash-pending-approvals" class="font-serif text-3xl font-bold text-[#B9674B]">0</div>
+              <div class="text-[11px] text-[#66625A] mt-1">Waiting for review</div>
+            </div>
+
+            <div class="rounded-2xl bg-[#E9DFD0] p-5 border border-[#DDD3C3] shadow-xs">
+              <div class="flex items-center justify-between text-xs font-medium text-[#414A37] mb-2">
+                <span data-i18n="dashBuyerEnquiries">Buyer Enquiries</span>
+                <span class="w-8 h-8 rounded-xl bg-white text-[#B9674B] flex items-center justify-center">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </span>
+              </div>
+              <div id="dash-buyer-enquiries" class="font-serif text-3xl font-bold text-[#34332F]">2</div>
+              <div class="text-[11px] text-[#414A37] font-medium mt-1">Direct WhatsApp & phone leads</div>
+            </div>
+          </div>
+
+          <!-- Hero Highlight Banner + Quick Shortcuts -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 rounded-3xl bg-[#414A37] text-[#F8F5EF] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-[#32392A]">
+              <div class="space-y-3 text-center sm:text-left">
+                <span class="inline-block px-3 py-1 rounded-full bg-[#89977B]/25 text-[#F8F5EF] text-xs font-medium">
+                  Direct Trade • Zero Middlemen
+                </span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold leading-snug" data-i18n="heroHeading">
+                  Empowering Rural Artisans with AI Cataloging & Fair Direct Markets
+                </h2>
+                <p class="text-xs sm:text-sm text-[#E9DFD0] max-w-xl leading-relaxed" data-i18n="heroDesc">
+                  Snap a craft photo or speak in your own language. AI helps write product details, suggest a fair price, and connect you directly with buyers.
+                </p>
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-2">
+                  <button id="hero-cta-browse" type="button" class="px-4 py-2.5 rounded-xl bg-[#F8F5EF] hover:bg-white text-[#414A37] text-xs sm:text-sm font-semibold transition-colors cursor-pointer">
+                    <span data-i18n="btnBrowseCatalog">View All Products</span>
+                  </button>
+                  <button id="hero-cta-ai-advisor" type="button" class="px-4 py-2.5 rounded-xl bg-[#89977B]/30 hover:bg-[#89977B]/45 text-[#F8F5EF] border border-[#89977B]/40 text-xs sm:text-sm font-medium transition-colors cursor-pointer">
+                    Ask AI Advisor
+                  </button>
+                  <button id="hero-cta-pricing" type="button" class="px-4 py-2.5 rounded-xl bg-[#89977B]/20 hover:bg-[#89977B]/35 text-[#F8F5EF] border border-[#89977B]/30 text-xs sm:text-sm font-medium transition-colors cursor-pointer">
+                    Calculate Fair Price
+                  </button>
+                </div>
+              </div>
+              <div class="hidden sm:flex flex-col items-center p-4 rounded-2xl bg-[#F8F5EF] text-[#34332F] flex-shrink-0 w-36 text-center">
+                <img src="./assets/artisan_logo.jpg" alt="Artisan" referrerpolicy="no-referrer" class="w-24 h-24 object-contain rounded-xl mb-2" />
+                <span class="font-serif font-bold text-xs tracking-wider uppercase text-[#414A37]">Artisan</span>
+              </div>
+            </div>
+
+            <!-- Recent Buyer Enquiries Card -->
+            <div class="lg:col-span-4 rounded-3xl bg-white p-6 border border-[#DDD3C3] shadow-xs flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-serif text-lg font-bold text-[#34332F]" data-i18n="dashRecentEnquiries">Recent Buyer Enquiries</h2>
+                  <button type="button" data-tab="inquiries" class="nav-tab-btn text-xs font-semibold text-[#B9674B] hover:underline cursor-pointer">
+                    View all →
+                  </button>
+                </div>
+                <div id="dash-recent-enquiries" class="space-y-3">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recently Added Products Section -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]" data-i18n="dashRecentProducts">Recently Added Products</h2>
+                <p class="text-xs sm:text-sm text-[#66625A]">Your latest craft listings ready for buyers</p>
+              </div>
+              <button type="button" data-tab="catalog" class="nav-tab-btn px-4 py-2 rounded-xl bg-white border border-[#DDD3C3] text-xs font-semibold text-[#34332F] hover:bg-[#E9DFD0]/40 transition-colors cursor-pointer">
+                Manage All →
+              </button>
+            </div>
+            <div id="dash-recent-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Explore by Craft Tradition (Preserved Category Shortcuts) -->
+          <div class="space-y-4">
+            <div>
+              <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]">Explore Craft Traditions</h2>
+              <p class="text-xs sm:text-sm text-[#66625A]">Browse handmade pieces by Indian craft category</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div data-home-category="Ceramics & Pottery" class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col">
+                <div class="aspect-[4/3] bg-[#E9DFD0] overflow-hidden relative">
+                  <img src="https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=600&auto=format&fit=crop&q=80" alt="Ceramics & Pottery" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <span class="absolute top-3 left-3 bg-[#F8F5EF]/95 text-[#414A37] text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C3]">GI Heritage</span>
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 class="font-serif font-bold text-[#34332F] text-base mb-1">Ceramics & Pottery</h3>
+                    <p class="text-xs text-[#66625A] line-clamp-2">Jaipur Blue Pottery and hand-painted terracotta.</p>
+                  </div>
+                  <div class="mt-3 pt-2.5 border-t border-[#EAE2D5] text-xs font-semibold text-[#B9674B] flex items-center justify-between">
+                    <span>Explore</span><span>→</span>
+                  </div>
+                </div>
+              </div>
+
+              <div data-home-category="Paintings & Folk Art" class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col">
+                <div class="aspect-[4/3] bg-[#E9DFD0] overflow-hidden relative">
+                  <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80" alt="Paintings & Folk Art" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <span class="absolute top-3 left-3 bg-[#F8F5EF]/95 text-[#B9674B] text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C3]">Folk Tradition</span>
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 class="font-serif font-bold text-[#34332F] text-base mb-1">Paintings & Folk Art</h3>
+                    <p class="text-xs text-[#66625A] line-clamp-2">Mithila Madhubani natural dyes & Pattachitra art.</p>
+                  </div>
+                  <div class="mt-3 pt-2.5 border-t border-[#EAE2D5] text-xs font-semibold text-[#B9674B] flex items-center justify-between">
+                    <span>Explore</span><span>→</span>
+                  </div>
+                </div>
+              </div>
+
+              <div data-home-category="Wooden Toys & Carvings" class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col">
+                <div class="aspect-[4/3] bg-[#E9DFD0] overflow-hidden relative">
+                  <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=600&auto=format&fit=crop&q=80" alt="Wooden Toys & Carvings" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <span class="absolute top-3 left-3 bg-[#F8F5EF]/95 text-[#414A37] text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C3]">Child Safe</span>
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 class="font-serif font-bold text-[#34332F] text-base mb-1">Wooden Toys & Carvings</h3>
+                    <p class="text-xs text-[#66625A] line-clamp-2">Channapatna natural lacquer turned wooden toys.</p>
+                  </div>
+                  <div class="mt-3 pt-2.5 border-t border-[#EAE2D5] text-xs font-semibold text-[#B9674B] flex items-center justify-between">
+                    <span>Explore</span><span>→</span>
+                  </div>
+                </div>
+              </div>
+
+              <div data-home-category="Metalcraft & Bell Metal" class="craft-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col">
+                <div class="aspect-[4/3] bg-[#E9DFD0] overflow-hidden relative">
+                  <img src="https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=600&auto=format&fit=crop&q=80" alt="Metalcraft & Bell Metal" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <span class="absolute top-3 left-3 bg-[#F8F5EF]/95 text-[#B9674B] text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C3]">Lost-Wax Brass</span>
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 class="font-serif font-bold text-[#34332F] text-base mb-1">Metalcraft & Bell Metal</h3>
+                    <p class="text-xs text-[#66625A] line-clamp-2">Bastar Dhokra handcrafted brass sculptures.</p>
+                  </div>
+                  <div class="mt-3 pt-2.5 border-t border-[#EAE2D5] text-xs font-semibold text-[#B9674B] flex items-center justify-between">
+                    <span>Explore</span><span>→</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 2: PRODUCT MANAGEMENT & CATALOG                                -->
+        <!-- =================================================================== -->
+        <section id="view-catalog" class="tab-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]" data-i18n="navProducts">Products</h1>
+              <p class="text-xs sm:text-sm text-[#66625A]">View, edit, or share your handcrafted product listings</p>
+            </div>
+            <button type="button" data-tab="cataloging" class="nav-tab-btn min-h-[44px] px-5 py-2.5 rounded-xl bg-[#B9674B] hover:bg-[#A3553A] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer">
+              <span>+ Add New Product</span>
+            </button>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#DDD3C3] shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row gap-3">
+              <div class="relative flex-1">
+                <svg class="w-4 h-4 text-[#66625A] absolute left-3.5 top-3 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input
+                  type="text"
+                  id="catalog-search-input"
+                  placeholder="Search by product name, state, or material..."
+                  data-i18n-placeholder="searchPlaceholder"
+                  class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD3C3] focus:outline-none focus:ring-2 focus:ring-[#89977B] text-sm bg-[#F8F5EF]"
+                />
+              </div>
+
+              <select id="catalog-category-filter" class="py-2.5 px-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF] text-[#34332F] focus:outline-none focus:ring-2 focus:ring-[#89977B]"></select>
+              <select id="catalog-state-filter" class="py-2.5 px-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF] text-[#34332F] focus:outline-none focus:ring-2 focus:ring-[#89977B]"></select>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#EAE2D5] text-xs text-[#66625A]">
+              <div class="flex items-center gap-2">
+                <button type="button" data-status="all" class="catalog-status-btn px-3 py-1.5 rounded-lg bg-[#414A37] text-white font-semibold cursor-pointer">All</button>
+                <button type="button" data-status="published" class="catalog-status-btn px-3 py-1.5 rounded-lg bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3] font-medium cursor-pointer">Published</button>
+                <button type="button" data-status="pending" class="catalog-status-btn px-3 py-1.5 rounded-lg bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3] font-medium cursor-pointer">Pending</button>
+              </div>
+
+              <div class="flex items-center gap-3 flex-1 max-w-xs">
+                <span class="font-medium whitespace-nowrap" data-i18n="filterPrice">Max Price:</span>
+                <input type="range" id="catalog-price-slider" min="500" max="10000" step="250" value="10000" class="w-full accent-[#B9674B]" />
+                <span id="catalog-price-val" class="font-bold text-[#414A37] min-w-[70px]">₹10,000</span>
+              </div>
+
+              <div id="catalog-results-count" class="font-semibold text-[#34332F]">4 Products</div>
+            </div>
+          </div>
+
+          <!-- Products Grid -->
+          <div id="catalog-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 3: AI PRODUCT CREATION (SIMPLE 3-STEP WORKFLOW)                -->
+        <!-- =================================================================== -->
+        <section id="view-cataloging" class="tab-view hidden max-w-4xl mx-auto space-y-6">
+          <div class="text-center sm:text-left">
+            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]">Add a New Product</h1>
+            <p class="text-xs sm:text-sm text-[#66625A] mt-1">Follow 3 simple steps: upload a photo, let AI draft the details, then review and publish.</p>
+          </div>
+
+          <!-- Clean 3-Step Progress Bar -->
+          <div class="bg-white p-3 sm:p-4 rounded-2xl border border-[#DDD3C3] grid grid-cols-3 gap-2">
+            <div data-step="1" class="step-indicator-pill px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#414A37] text-white text-center truncate" data-i18n="step1Short">
+              1. Upload Photo
+            </div>
+            <div data-step="2" class="step-indicator-pill px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#F8F5EF] text-[#66625A] border border-[#DDD3C3] text-center truncate" data-i18n="step2Short">
+              2. Generate Details
+            </div>
+            <div data-step="3" class="step-indicator-pill px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#F8F5EF] text-[#66625A] border border-[#DDD3C3] text-center truncate" data-i18n="step3Short">
+              3. Review & Publish
+            </div>
+          </div>
+
+          <!-- STEP 1: UPLOAD PRODUCT PHOTOGRAPH -->
+          <div id="wizard-step-1" class="wizard-step-panel bg-white p-5 sm:p-8 rounded-3xl border border-[#DDD3C3] shadow-xs space-y-6">
+            <div>
+              <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]" data-i18n="step1Title">Step 1: Upload Product Photograph</h2>
+              <p class="text-xs sm:text-sm text-[#66625A] mt-1" data-i18n="step1Subtitle">Choose a clear photo from your phone or take one with your camera.</p>
+            </div>
+
+            <!-- Live Camera Container (Shown when user clicks Open Camera) -->
+            <div id="camera-container" class="hidden rounded-2xl overflow-hidden bg-[#34332F] relative aspect-[4/3] max-w-md mx-auto">
+              <video id="camera-stream" autoplay playsinline class="w-full h-full object-cover"></video>
+              <div class="absolute inset-5 border-2 border-dashed border-white/60 rounded-xl pointer-events-none"></div>
+              <div class="absolute bottom-4 inset-x-0 flex items-center justify-center gap-3">
+                <button id="btn-shutter-snap" type="button" class="px-5 py-3 rounded-full bg-white text-[#34332F] font-bold text-sm shadow-lg active:scale-95 transition-transform cursor-pointer">
+                  Take Photo
+                </button>
+                <button id="btn-close-camera" type="button" class="px-4 py-2.5 rounded-full bg-[#34332F]/80 text-white text-xs font-medium cursor-pointer">
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Primary Easiest Upload Target -->
+            <label id="file-dropzone" class="block p-8 sm:p-10 rounded-3xl border-2 border-dashed border-[#B9674B]/60 hover:border-[#B9674B] bg-[#F8F5EF] hover:bg-[#E9DFD0]/45 text-center cursor-pointer transition-colors">
+              <input type="file" id="product-file-input" accept="image/*" class="hidden" />
+              <div class="w-16 h-16 rounded-2xl bg-[#B9674B] text-white flex items-center justify-center mx-auto mb-3 shadow-xs">
+                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="font-serif text-lg sm:text-xl font-bold text-[#34332F]" data-i18n="btnUploadFile">Tap Here to Upload Craft Photo</div>
+              <p class="text-xs sm:text-sm text-[#66625A] mt-1">Select a photo from your phone gallery, or drag and drop an image here</p>
+              <span class="inline-block mt-4 px-5 py-2.5 rounded-xl bg-white border border-[#DDD3C3] text-xs font-semibold text-[#414A37]">
+                Choose Photo from Device
+              </span>
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F2] border border-[#E6E2D6] cursor-pointer">
-              <div>
-                <div class="font-bold text-[#102F35]">Large Typography Mode</div>
-                <div class="text-[#566C70]">Increase text scale across all buttons and craft story narratives</div>
+            <!-- Secondary Camera Button -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <button id="btn-open-camera" type="button" class="min-h-[46px] px-5 py-3 rounded-xl bg-[#E9DFD0] hover:bg-[#DDD3C3] text-[#34332F] font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                <svg class="w-4.5 h-4.5 text-[#414A37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span data-i18n="btnTakePhoto">Or Open Camera</span>
+              </button>
+
+              <!-- Sample Demos -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-xs text-[#66625A] font-medium mr-1">Try sample:</span>
+                <button type="button" data-craft="madhubani" class="sample-craft-btn px-3 py-1.5 rounded-lg bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-medium border border-[#DDD3C3] cursor-pointer">Madhubani</button>
+                <button type="button" data-craft="channapatna" class="sample-craft-btn px-3 py-1.5 rounded-lg bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-medium border border-[#DDD3C3] cursor-pointer">Wooden Toy</button>
+                <button type="button" data-craft="bluepottery" class="sample-craft-btn px-3 py-1.5 rounded-lg bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-medium border border-[#DDD3C3] cursor-pointer">Blue Pottery</button>
+                <button type="button" data-craft="dhokra" class="sample-craft-btn px-3 py-1.5 rounded-lg bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] text-xs font-medium border border-[#DDD3C3] cursor-pointer">Dhokra Brass</button>
               </div>
-              <input type="checkbox" id="settings-font-toggle" class="w-5 h-5 accent-[#174C43]" />
-            </label>
+            </div>
+
+            <!-- Selected Photo Preview -->
+            <div id="photo-preview-container" class="hidden rounded-2xl p-4 bg-[#E9DFD0]/55 border border-[#DDD3C3] flex items-center gap-4">
+              <img id="uploaded-photo-preview" class="w-20 h-20 object-cover rounded-xl border border-white shadow-xs flex-shrink-0" alt="Selected craft preview" />
+              <div class="min-w-0">
+                <div class="text-sm font-bold text-[#414A37]">✓ Photo ready</div>
+                <p class="text-xs text-[#66625A] mt-0.5">Tap "Generate Details with AI" below to write the title, story, and fair price.</p>
+              </div>
+            </div>
+
+            <!-- Optional Voice / Text Note -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <label for="voice-input-text" class="text-xs sm:text-sm font-semibold text-[#34332F]" data-i18n="voiceAssistant">
+                  Tell us about your craft (Optional — type or speak)
+                </label>
+                <span id="voice-pulse-status" class="text-xs font-bold text-[#B9674B] hidden animate-pulse"></span>
+              </div>
+              <p class="text-xs text-[#66625A]" data-i18n="voicePromptHelp">Mention what material you used and how many hours it took.</p>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <textarea
+                  id="voice-input-text"
+                  rows="2"
+                  placeholder="Example: Handmade clay pot, took 8 hours using natural river clay..."
+                  data-i18n-placeholder="voicePlaceholder"
+                  class="flex-1 text-sm p-3 rounded-xl border border-[#DDD3C3] focus:outline-none focus:ring-2 focus:ring-[#89977B] bg-white"
+                ></textarea>
+                <button
+                  id="btn-voice-record"
+                  type="button"
+                  class="min-h-[48px] px-4 py-2.5 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                  <span data-i18n="tapToSpeak">Tap to Speak</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Primary Step 1 Action -->
+            <button
+              id="btn-trigger-ai-analysis"
+              type="button"
+              class="w-full min-h-[52px] py-3.5 px-6 rounded-2xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-base shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span data-i18n="btnGenerateAI">Generate Details with AI</span>
+              <span>→</span>
+            </button>
           </div>
-        </div>
 
-        <!-- Role Mode Switcher Card -->
-        <div class="bg-white p-6 rounded-2xl border border-[#E6E2D6] shadow-2xs space-y-3">
-          <h3 class="font-serif font-bold text-base text-[#102F35] flex items-center gap-2">
-            <span>🎭</span> <span>Application Role Mode</span>
-          </h3>
-          <p class="text-xs text-[#566C70]">Toggle between Artisan creator view and conscious patron / buyer exploration view.</p>
-          <select id="settings-role-select" class="w-full p-2.5 rounded-xl border border-[#E6E2D6] bg-[#FAF8F2] text-xs font-semibold text-[#102F35] focus:ring-2 focus:ring-[#174C43]">
-            <option value="artisan">Artisan Mode (Workshop, Cataloging & Leads)</option>
-            <option value="buyer">Conscious Buyer Mode (Craft Stories, Direct Inquiries & Orders)</option>
-          </select>
-        </div>
-
-        <!-- Offline Sync & Village Storage Card -->
-        <div class="bg-white p-6 rounded-2xl border border-[#E6E2D6] shadow-2xs space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="font-serif font-bold text-base text-[#102F35] flex items-center gap-2">
-              <span>📶</span> <span>Offline Village Sync & Storage</span>
-            </h3>
-            <span class="px-2.5 py-0.5 rounded-full bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7] text-[10px] font-bold">
-              ✓ Local Storage Active
-            </span>
+          <!-- AI Loading State -->
+          <div id="ai-analysis-loading" class="hidden p-10 text-center bg-white rounded-3xl border border-[#DDD3C3] shadow-xs space-y-4">
+            <div class="w-11 h-11 border-4 border-[#B9674B] border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <h3 class="font-serif font-bold text-[#34332F] text-lg">Creating Your Product Details...</h3>
+            <p class="text-xs sm:text-sm text-[#66625A] max-w-md mx-auto" data-i18n="analyzingCraft">
+              Looking at your craft photo to identify materials, colors, and write a warm heritage story.
+            </p>
           </div>
-          <p class="text-xs text-[#566C70]">All product drafts and pricing formulas are safely stored on device storage for offline village resilience.</p>
-          <button 
-            id="settings-btn-sync-now" 
-            type="button" 
-            class="px-4 py-2 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white text-xs font-bold transition-colors"
-          >
-            Manual Sync with Cloud Registry Now
-          </button>
-        </div>
-      </section>
 
-    </main>
+          <!-- STEP 2: AI GENERATED DETAILS & PHOTO POLISH -->
+          <div id="wizard-step-2" class="wizard-step-panel hidden bg-white p-5 sm:p-8 rounded-3xl border border-[#DDD3C3] shadow-xs space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]" data-i18n="step2Title">Step 2: Generated Product Details</h2>
+                <p class="text-xs sm:text-sm text-[#66625A]">Check what AI found and choose a clean photo background if you like.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="res-confidence-badge" class="px-3 py-1 rounded-full bg-[#89977B]/20 text-[#414A37] text-xs font-semibold flex items-center gap-1.5">
+                  <span id="res-confidence-text">92% Match</span>
+                </span>
+                <span id="res-gi-tag" class="px-3 py-1 rounded-full bg-[#E9DFD0] text-[#414A37] text-xs font-semibold">
+                  Heritage Check: <span id="res-gi-status-text">Estimated</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Helpful Verification Note -->
+            <div id="res-guardrail-banner" class="hidden p-4 rounded-2xl bg-[#E9DFD0] border border-[#DDD3C3] text-[#34332F] text-xs flex items-start gap-3">
+              <span class="text-base flex-shrink-0">ℹ️</span>
+              <div class="space-y-1">
+                <div class="font-bold text-[#414A37]" id="res-guardrail-title">Quick Check Recommended</div>
+                <p class="text-[#34332F]/85 leading-relaxed" id="res-guardrail-desc"></p>
+                <div id="res-verification-notice" class="text-[11px] text-[#B9674B] font-semibold"></div>
+              </div>
+            </div>
+
+            <!-- Detected Attributes -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-4 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3]">
+                <div class="text-[#66625A] font-semibold mb-1" data-i18n="categoryLabel">Craft Category</div>
+                <div id="res-category" class="font-bold text-[#34332F] text-sm">--</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3]">
+                <div class="text-[#66625A] font-semibold mb-1" data-i18n="materialsLabel">Materials Used</div>
+                <div id="res-materials" class="flex flex-wrap gap-1.5 font-medium text-[#34332F]">--</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3]">
+                <div class="text-[#66625A] font-semibold mb-1" data-i18n="colorsLabel">Main Colors</div>
+                <div id="res-colors" class="flex flex-wrap gap-1.5 font-medium text-[#34332F]">--</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3]">
+                <div class="text-[#66625A] font-semibold mb-1" data-i18n="tagsLabel">Craft Style Tags</div>
+                <div id="res-tags" class="flex flex-wrap gap-1.5 font-medium text-[#34332F]">--</div>
+              </div>
+            </div>
+
+            <!-- Story Box -->
+            <div class="p-5 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3]">
+              <div class="font-semibold text-[#414A37] text-xs mb-1.5">Craft Story Draft</div>
+              <p id="res-story" class="text-xs sm:text-sm text-[#34332F] leading-relaxed"></p>
+            </div>
+
+            <!-- Studio Photo Background Polish (Optional Accordion) -->
+            <details class="rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] p-4">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-[#34332F]">
+                <span>Polish Photo Background (Optional)</span>
+                <svg class="details-chevron w-4 h-4 text-[#66625A] transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </summary>
+              <div class="pt-4 space-y-4">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                  <button type="button" data-style="studio_white" class="bg-style-btn p-2.5 rounded-xl border border-[#DDD3C3] text-center ring-2 ring-[#414A37] bg-white cursor-pointer">
+                    <div class="w-6 h-6 rounded-full bg-stone-100 border border-stone-300 mx-auto mb-1"></div>
+                    <span class="text-xs font-semibold block text-[#34332F]" data-i18n="bgStudioWhite">Clean White</span>
+                  </button>
+                  <button type="button" data-style="warm_terracotta" class="bg-style-btn p-2.5 rounded-xl border border-[#DDD3C3] text-center bg-white cursor-pointer">
+                    <div class="w-6 h-6 rounded-full bg-[#E9DFD0] border border-[#B9674B] mx-auto mb-1"></div>
+                    <span class="text-xs font-semibold block text-[#34332F]" data-i18n="bgWarmTerracotta">Warm Earth</span>
+                  </button>
+                  <button type="button" data-style="silk_velvet" class="bg-style-btn p-2.5 rounded-xl border border-[#DDD3C3] text-center bg-white cursor-pointer">
+                    <div class="w-6 h-6 rounded-full bg-[#414A37]/20 border border-[#414A37] mx-auto mb-1"></div>
+                    <span class="text-xs font-semibold block text-[#34332F]" data-i18n="bgSilkVelvet">Olive Silk</span>
+                  </button>
+                  <button type="button" data-style="raw_canvas" class="bg-style-btn p-2.5 rounded-xl border border-[#DDD3C3] text-center bg-white cursor-pointer">
+                    <div class="w-6 h-6 rounded-full bg-[#F8F5EF] border border-[#89977B] mx-auto mb-1"></div>
+                    <span class="text-xs font-semibold block text-[#34332F]" data-i18n="bgRawCanvas">Natural Canvas</span>
+                  </button>
+                  <button type="button" data-style="transparent" class="bg-style-btn p-2.5 rounded-xl border border-[#DDD3C3] text-center bg-white cursor-pointer">
+                    <div class="w-6 h-6 rounded-full bg-stone-200 border border-stone-400 mx-auto mb-1"></div>
+                    <span class="text-xs font-semibold block text-[#34332F]" data-i18n="bgTransparent">Cutout</span>
+                  </button>
+                </div>
+                <div class="aspect-[4/3] max-w-xs mx-auto rounded-2xl overflow-hidden border border-[#DDD3C3] bg-white">
+                  <img id="enhanced-photo-preview" class="w-full h-full object-cover" alt="Craft Preview" />
+                </div>
+              </div>
+            </details>
+
+            <!-- Navigation -->
+            <div class="flex items-center justify-between pt-4 border-t border-[#EAE2D5]">
+              <button type="button" data-prev="1" class="wizard-prev-btn min-h-[44px] px-4 py-2 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] font-semibold text-xs sm:text-sm border border-[#DDD3C3] cursor-pointer">
+                ← Back
+              </button>
+              <button type="button" data-next="3" class="wizard-next-btn min-h-[46px] px-6 py-2.5 rounded-xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-xs sm:text-sm cursor-pointer">
+                Next: Review & Publish →
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3: REVIEW, EDIT, FAIR PRICE & PUBLISH -->
+          <div id="wizard-step-3" class="wizard-step-panel hidden bg-white p-5 sm:p-8 rounded-3xl border border-[#DDD3C3] shadow-xs space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]" data-i18n="step5Title">Step 3: Review, Edit & Publish</h2>
+                <p class="text-xs sm:text-sm text-[#66625A]" data-i18n="step5Subtitle">Check your title, story, and fair price before publishing.</p>
+              </div>
+              <div class="px-4 py-2 rounded-2xl bg-[#E9DFD0] border border-[#DDD3C3] text-right">
+                <span class="text-[11px] text-[#66625A] font-medium block">Suggested Selling Price</span>
+                <div id="review-final-price-badge" class="font-serif font-bold text-2xl text-[#414A37]">₹2,250</div>
+              </div>
+            </div>
+
+            <!-- Simple Title & Story -->
+            <div class="space-y-4">
+              <div>
+                <label for="input-review-title" class="block text-xs sm:text-sm font-semibold text-[#34332F] mb-1.5" data-i18n="productTitleLabel">Product Name</label>
+                <input type="text" id="input-review-title" class="w-full p-3.5 rounded-xl border border-[#DDD3C3] text-sm font-semibold bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B]" />
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="input-review-desc" class="block text-xs sm:text-sm font-semibold text-[#34332F]" data-i18n="productDescLabel">Product Story & Details</label>
+                  <button type="button" id="btn-tts-read-story" class="text-xs text-[#B9674B] font-semibold flex items-center gap-1 hover:underline cursor-pointer">
+                    <span>🔊</span> <span data-i18n="readAloud">Listen Aloud</span>
+                  </button>
+                </div>
+                <textarea id="input-review-desc" rows="4" class="w-full p-3.5 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B] leading-relaxed"></textarea>
+              </div>
+
+              <!-- Language Translation -->
+              <div class="p-3.5 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <span class="font-medium text-[#34332F]">Translate story to another language:</span>
+                <div class="flex items-center gap-2">
+                  <select id="review-translate-lang" class="py-2 px-3 rounded-xl border border-[#DDD3C3] bg-white text-xs text-[#34332F]">
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                    <option value="mr">Marathi (मराठी)</option>
+                    <option value="ta">Tamil (தமிழ்)</option>
+                    <option value="te">Telugu (తెలుగు)</option>
+                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                    <option value="od">Odia (ଓଡ଼ିଆ)</option>
+                    <option value="en">English</option>
+                  </select>
+                  <button type="button" id="btn-translate-review" class="px-4 py-2 rounded-xl bg-[#414A37] text-white font-semibold text-xs hover:bg-[#32392A] transition-colors cursor-pointer">
+                    Translate
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simple Fair Price Card -->
+            <div class="p-5 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3] space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 class="font-serif font-bold text-base text-[#34332F]">Fair Price Check</h3>
+                  <p class="text-xs text-[#66625A]">Enter your costs in simple numbers so you always earn a fair income.</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-[#66625A]">Your Take-Home: <strong id="disp-artisan-earnings" class="text-[#414A37]">₹1,950</strong></div>
+                  <div class="text-[11px] text-[#66625A]">Store Price: <span id="disp-market-benchmark" class="line-through">₹3,600</span></div>
+                  <span id="disp-fair-price" class="hidden">₹2,250</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label for="input-calc-material" class="block text-xs font-semibold text-[#34332F] mb-1">Material Cost (₹)</label>
+                  <input type="number" id="input-calc-material" value="320" class="w-full p-2.5 rounded-xl border border-[#DDD3C3] text-sm font-semibold bg-white" />
+                </div>
+                <div>
+                  <label for="input-calc-hours" class="block text-xs font-semibold text-[#34332F] mb-1">Hours Worked</label>
+                  <input type="number" id="input-calc-hours" value="16" step="0.5" class="w-full p-2.5 rounded-xl border border-[#DDD3C3] text-sm font-semibold bg-white" />
+                </div>
+                <div>
+                  <label for="input-calc-wage" class="block text-xs font-semibold text-[#34332F] mb-1">Hourly Pay (₹/hr)</label>
+                  <input type="number" id="input-calc-wage" value="85" class="w-full p-2.5 rounded-xl border border-[#DDD3C3] text-sm font-semibold bg-white" />
+                </div>
+              </div>
+
+              <details class="pt-2 border-t border-[#DDD3C3]">
+                <summary class="text-xs font-semibold text-[#414A37] cursor-pointer flex items-center justify-between">
+                  <span>Advanced Pricing Options (Optional)</span>
+                  <svg class="details-chevron w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="grid grid-cols-2 gap-3 pt-3">
+                  <div>
+                    <label for="input-calc-overhead" class="block text-xs font-semibold text-[#34332F] mb-1">Packing & Travel (₹)</label>
+                    <input type="number" id="input-calc-overhead" value="120" class="w-full p-2.5 rounded-xl border border-[#DDD3C3] text-sm font-semibold bg-white" />
+                  </div>
+                  <div>
+                    <label for="input-calc-margin" class="block text-xs font-semibold text-[#34332F] mb-1">Extra Profit (%)</label>
+                    <input type="number" id="input-calc-margin" value="25" class="w-full p-2.5 rounded-xl border border-[#DDD3C3] text-sm font-semibold bg-white" />
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- Publish Button -->
+            <div class="flex items-center justify-between pt-4 border-t border-[#EAE2D5]">
+              <button type="button" data-prev="2" class="wizard-prev-btn min-h-[44px] px-4 py-2 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] font-semibold text-xs sm:text-sm border border-[#DDD3C3] cursor-pointer">
+                ← Back
+              </button>
+              <button id="btn-publish-craft" type="button" class="min-h-[48px] px-7 py-3 rounded-2xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-sm shadow-sm flex items-center gap-2 cursor-pointer">
+                <span>✓</span> <span data-i18n="btnApprovePublish">Publish Product</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 4: AI ARTISAN ADVISOR (WARM CONVERSATIONAL UI)                 -->
+        <!-- =================================================================== -->
+        <section id="view-ai-advisor" class="tab-view hidden max-w-4xl mx-auto space-y-4">
+          <div class="bg-white rounded-3xl border border-[#DDD3C3] shadow-xs overflow-hidden flex flex-col h-[78vh] min-h-[540px] max-h-[760px]">
+
+            <!-- Chat Header -->
+            <div class="p-4 sm:p-5 bg-[#E9DFD0] border-b border-[#DDD3C3] flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-[#414A37] text-[#F8F5EF] flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div>
+                  <h2 class="font-serif font-bold text-base sm:text-lg text-[#34332F]" data-i18n="advisorTitle">AI Artisan Advisor</h2>
+                  <p class="text-xs text-[#66625A]" data-i18n="advisorSubtitle">Ask in English or Hindi about fair pricing, stories, or buyers</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <!-- Quick English / Hindi Toggle -->
+                <div class="inline-flex rounded-xl bg-white p-0.5 border border-[#DDD3C3] text-xs">
+                  <button type="button" id="advisor-lang-en" class="px-2.5 py-1 rounded-lg font-semibold text-[#34332F] cursor-pointer">English</button>
+                  <button type="button" id="advisor-lang-hi" class="px-2.5 py-1 rounded-lg font-semibold text-[#34332F] cursor-pointer">हिन्दी</button>
+                </div>
+                <button id="btn-clear-ai-chat" type="button" title="Start fresh conversation" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3] text-xs font-semibold cursor-pointer">
+                  New Chat
+                </button>
+              </div>
+            </div>
+
+            <!-- Suggested Questions Bar -->
+            <div class="bg-[#F8F5EF] border-b border-[#EAE2D5] px-4 py-2.5 overflow-x-auto hide-scrollbar flex items-center gap-2 text-xs">
+              <span class="font-semibold text-[#414A37] flex-shrink-0">Suggested:</span>
+              <button type="button" class="ai-prompt-chip px-3 py-1.5 rounded-full bg-white hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] whitespace-nowrap font-medium cursor-pointer" data-prompt="How do I calculate a fair price for a handmade Madhubani painting that took 15 hours?">
+                Fair price for 15hr painting
+              </button>
+              <button type="button" class="ai-prompt-chip px-3 py-1.5 rounded-full bg-white hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] whitespace-nowrap font-medium cursor-pointer" data-prompt="एक हाथ से बनी मिट्टी या लकड़ी की कलाकृति का सही और उचित दाम कैसे तय करें? कृपया सरल हिंदी में बताएं।">
+                सही दाम कैसे तय करें? (हिन्दी)
+              </button>
+              <button type="button" class="ai-prompt-chip px-3 py-1.5 rounded-full bg-white hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] whitespace-nowrap font-medium cursor-pointer" data-prompt="Write a warm craft story for a handmade brass sculpture so buyers appreciate the effort.">
+                Write craft story for buyers
+              </button>
+              <button type="button" class="ai-prompt-chip px-3 py-1.5 rounded-full bg-white hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] whitespace-nowrap font-medium cursor-pointer" data-prompt="How can I explain to a customer why handmade items cost more than factory products?">
+                Explain handmade value
+              </button>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="ai-chat-messages" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-[#F8F5EF]/50">
+              <div class="flex items-start gap-3 max-w-2xl">
+                <div class="w-8 h-8 rounded-xl bg-[#414A37] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  AI
+                </div>
+                <div class="bg-white p-4 rounded-2xl rounded-tl-xs border border-[#DDD3C3] text-xs sm:text-sm text-[#34332F] space-y-2 leading-relaxed">
+                  <div class="font-serif font-bold text-[#414A37]">Namaste! How can I help you today?</div>
+                  <p class="text-[#66625A]">
+                    Ask me anything in simple English or Hindi. I can help you decide a fair selling price, write product stories, or answer buyer questions.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="ai-chat-loading" class="hidden px-6 py-3 bg-[#E9DFD0]/60 border-t border-[#DDD3C3] flex items-center gap-2.5 text-xs text-[#414A37] font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#B9674B] animate-ping"></span>
+              <span>Thinking and preparing a helpful answer...</span>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-3 sm:p-4 bg-white border-t border-[#DDD3C3]">
+              <form id="ai-chat-form" class="flex items-center gap-2">
+                <button
+                  id="btn-ai-chat-mic"
+                  type="button"
+                  title="Speak your question"
+                  class="w-11 h-11 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#414A37] border border-[#DDD3C3] flex items-center justify-center flex-shrink-0 cursor-pointer"
+                >
+                  <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+                </button>
+                <input
+                  id="ai-chat-input"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Type your question in English or Hindi..."
+                  class="flex-1 min-w-0 py-3 px-4 rounded-xl bg-[#F8F5EF] border border-[#DDD3C3] focus:outline-none focus:ring-2 focus:ring-[#89977B] text-sm text-[#34332F]"
+                />
+                <button
+                  id="btn-ai-chat-send"
+                  type="submit"
+                  class="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-sm flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
+                >
+                  <span>Send</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 5: MY STUDIO                                                   -->
+        <!-- =================================================================== -->
+        <section id="view-studio" class="tab-view hidden space-y-6">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#DDD3C3] shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <img id="artisan-profile-avatar" src="./assets/sitadevi_profile.jpg" alt="Sitadevi Devi" referrerpolicy="no-referrer" class="w-24 h-24 rounded-2xl object-cover border-2 border-[#89977B]" />
+            <div class="flex-1 text-center sm:text-left">
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1.5">
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]">Sitadevi Devi</h2>
+                <span class="px-2.5 py-0.5 rounded-full bg-[#89977B]/20 text-[#414A37] text-xs font-semibold">✓ Verified Artisan</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-[#E9DFD0] text-[#B9674B] text-xs font-semibold">GI Heritage</span>
+              </div>
+              <p class="text-xs sm:text-sm text-[#66625A] mb-2">Ranti Village, Madhubani, Bihar • 28 Years Experience</p>
+              <p class="text-xs sm:text-sm text-[#34332F]/85 max-w-xl mb-4 leading-relaxed">
+                4th generation Mithila artist specializing in natural dye paintings on handmade cotton paper.
+              </p>
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                <button id="btn-studio-add-craft" type="button" class="px-4 py-2.5 rounded-xl bg-[#B9674B] hover:bg-[#A3553A] text-white text-xs sm:text-sm font-semibold cursor-pointer">
+                  + Add New Product
+                </button>
+                <button id="btn-studio-view-profile" type="button" class="px-4 py-2.5 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] text-xs sm:text-sm font-semibold cursor-pointer">
+                  View Public Profile
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-[#DDD3C3]">
+              <div class="text-[#66625A] text-xs font-medium" data-i18n="totalListings">Active Products</div>
+              <div id="studio-listings-count" class="font-serif text-3xl font-bold text-[#414A37] mt-1">1</div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-[#DDD3C3]">
+              <div class="text-[#66625A] text-xs font-medium" data-i18n="totalInquiries">Buyer Enquiries</div>
+              <div id="studio-inquiries-count" class="font-serif text-3xl font-bold text-[#B9674B] mt-1">2</div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-[#DDD3C3]">
+              <div class="text-[#66625A] text-xs font-medium" data-i18n="fairTradeScore">Fair Pay Kept</div>
+              <div class="font-serif text-3xl font-bold text-[#414A37] mt-1">100%</div>
+            </div>
+            <div class="bg-[#E9DFD0] p-5 rounded-2xl border border-[#DDD3C3]">
+              <div class="text-[#414A37] text-xs font-medium">Trust Rating</div>
+              <div class="font-serif text-3xl font-bold text-[#34332F] mt-1">4.9 / 5</div>
+            </div>
+          </div>
+
+          <!-- Studio Products Management -->
+          <div class="space-y-3">
+            <h3 class="font-serif font-bold text-lg text-[#34332F]">My Studio Products</h3>
+            <div id="studio-products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Recent Inquiries Preview -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-serif font-bold text-lg text-[#34332F]">Direct Buyer Enquiries</h3>
+              <span class="text-xs text-[#66625A]">Zero commission</span>
+            </div>
+            <div id="studio-inquiries-list" class="space-y-3">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 6: BUYER ENQUIRIES                                             -->
+        <!-- =================================================================== -->
+        <section id="view-inquiries" class="tab-view hidden space-y-6">
+          <div>
+            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]" data-i18n="navInquiries">Buyer Enquiries</h1>
+            <p class="text-xs sm:text-sm text-[#66625A] mt-1">Buyers interested in your crafts — reply directly on WhatsApp or by phone.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-[#E9DFD0] border border-[#DDD3C3] text-xs sm:text-sm text-[#34332F] flex flex-wrap items-center justify-between gap-2">
+            <span>All enquiries go directly to you with zero middleman fees.</span>
+            <span class="font-semibold text-[#414A37]">Direct Payment: UPI & Bank</span>
+          </div>
+
+          <div id="inquiries-page-list" class="space-y-3">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 7: FAIR PRICING                                                -->
+        <!-- =================================================================== -->
+        <section id="view-pricing-engine" class="tab-view hidden space-y-6">
+          <div id="material-pricing-wizard-mount"></div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 9: ARTISAN PUBLIC PROFILE                                      -->
+        <!-- =================================================================== -->
+        <section id="view-artisan-profile" class="tab-view hidden space-y-8">
+          <div class="bg-white rounded-3xl border border-[#DDD3C3] p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl overflow-hidden border-2 border-[#89977B] flex-shrink-0">
+              <img src="./assets/sitadevi_profile.jpg" alt="Sitadevi Devi" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex-1 text-center md:text-left space-y-3">
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]">Sitadevi Devi</h2>
+                <span class="px-3 py-1 rounded-full bg-[#89977B]/20 text-[#414A37] text-xs font-semibold">✓ Master Artisan</span>
+                <span class="px-3 py-1 rounded-full bg-[#E9DFD0] text-[#B9674B] text-xs font-semibold">GI Certified</span>
+              </div>
+              <p class="text-xs sm:text-sm text-[#66625A]">
+                Ranti Village, Madhubani, Bihar • 28 Years Experience • 4th Generation Craftswoman
+              </p>
+              <p class="text-xs sm:text-sm text-[#34332F]/85 leading-relaxed max-w-2xl">
+                Sitadevi Devi practices ancestral Bharni and Kachni Mithila styles using bamboo twigs and natural mineral dyes on handmade cotton paper.
+              </p>
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+                <button id="artisan-profile-whatsapp" type="button" class="px-4 py-2.5 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs sm:text-sm font-semibold cursor-pointer">
+                  Message on WhatsApp
+                </button>
+                <button id="artisan-profile-call" type="button" class="px-4 py-2.5 rounded-xl bg-[#F8F5EF] hover:bg-[#E9DFD0] text-[#34332F] border border-[#DDD3C3] text-xs sm:text-sm font-semibold cursor-pointer">
+                  Call Directly
+                </button>
+                <span class="px-3 py-2 rounded-xl bg-[#F8F5EF] text-xs font-medium text-[#66625A] border border-[#DDD3C3]">
+                  UPI: sitadevi@upi
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-serif text-xl sm:text-2xl font-bold text-[#34332F]">Creations by Sitadevi Devi</h3>
+              <span class="text-xs text-[#66625A]">100% Direct Fair Price</span>
+            </div>
+            <div id="artisan-profile-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 10: SETTINGS & ACCESSIBILITY                                   -->
+        <!-- =================================================================== -->
+        <section id="view-settings" class="tab-view hidden max-w-3xl mx-auto space-y-6">
+          <div>
+            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#34332F]">Settings & Accessibility</h1>
+            <p class="text-xs sm:text-sm text-[#66625A]">Choose your language, text size, and studio preferences</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-[#DDD3C3] space-y-3">
+            <h3 class="font-serif font-bold text-base text-[#34332F]">Language Preference</h3>
+            <p class="text-xs text-[#66625A]">Pick your preferred language for labels and voice support.</p>
+            <select id="settings-lang-select" class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] text-sm font-semibold text-[#34332F]"></select>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-[#DDD3C3] space-y-4">
+            <h3 class="font-serif font-bold text-base text-[#34332F]">Display & Readability</h3>
+            <div class="space-y-3 text-sm">
+              <label class="flex items-center justify-between p-3.5 rounded-xl bg-[#F8F5EF] border border-[#DDD3C3] cursor-pointer">
+                <div>
+                  <div class="font-semibold text-[#34332F]">High Contrast Mode</div>
+                  <div class="text-xs text-[#66625A]">Clearer screen contrast for bright outdoor sunlight</div>
+                </div>
+                <input type="checkbox" id="settings-contrast-toggle" class="w-5 h-5 accent-[#414A37]" />
+              </label>
+
+              <label class="flex items-center justify-between p-3.5 rounded-xl bg-[#F8F5EF] border border-[#DDD3C3] cursor-pointer">
+                <div>
+                  <div class="font-semibold text-[#34332F]">Larger Text Size</div>
+                  <div class="text-xs text-[#66625A]">Makes all buttons and text bigger and easier to read</div>
+                </div>
+                <input type="checkbox" id="settings-font-toggle" class="w-5 h-5 accent-[#414A37]" />
+              </label>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-[#DDD3C3] space-y-3">
+            <h3 class="font-serif font-bold text-base text-[#34332F]">View Mode</h3>
+            <p class="text-xs text-[#66625A]">Switch between managing your studio or browsing like a buyer.</p>
+            <select id="settings-role-select" class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] text-sm font-semibold text-[#34332F]">
+              <option value="artisan">Artisan Mode (Manage Products & Enquiries)</option>
+              <option value="buyer">Buyer Mode (Explore Crafts & Send Enquiries)</option>
+            </select>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-[#DDD3C3] space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-serif font-bold text-base text-[#34332F]">Offline Backup</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#89977B]/20 text-[#414A37] text-xs font-semibold">Saved on Device</span>
+            </div>
+            <p class="text-xs text-[#66625A]">Your drafts and prices are saved safely on this device even if your network drops.</p>
+            <button id="settings-btn-sync-now" type="button" class="px-4 py-2.5 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs font-semibold cursor-pointer">
+              Sync Saved Changes Now
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MOBILE BOTTOM NAVIGATION (TOUCH-FRIENDLY)                             -->
+    <!-- ===================================================================== -->
+    <nav class="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#DDD3C3] px-2 py-1.5 flex items-center justify-around shadow-md" aria-label="Mobile Navigation">
+      <button data-tab="home" class="nav-tab-btn mobile-nav-btn is-active flex flex-col items-center justify-center py-1 px-2 text-[11px] font-medium text-[#34332F] min-w-[56px]">
+        <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Home</span>
+      </button>
+
+      <button data-tab="catalog" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-[11px] font-medium text-[#66625A] min-w-[56px]">
+        <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/></svg>
+        <span>Products</span>
+      </button>
+
+      <button data-tab="cataloging" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center -mt-4 px-3 py-2 rounded-2xl bg-[#B9674B] text-white shadow-md text-[11px] font-semibold min-w-[60px]">
+        <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span>Add</span>
+      </button>
+
+      <button data-tab="ai-advisor" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-[11px] font-medium text-[#66625A] min-w-[56px]">
+        <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Advisor</span>
+      </button>
+
+      <button data-tab="pricing-engine" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-[11px] font-medium text-[#66625A] min-w-[56px]">
+        <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3v18"/><path d="M5 7h14"/><path d="m5 7-2 7a3 3 0 0 0 6 0L7 7"/><path d="m19 7-2 7a3 3 0 0 0 6 0l-2-7"/></svg>
+        <span>Pricing</span>
+      </button>
+    </nav>
 
     <!-- ===================================================================== -->
     <!-- MODAL 1: PRODUCT DETAIL & STORY MODAL                                 -->
     <!-- ===================================================================== -->
-    <div id="product-detail-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white max-w-2xl w-full max-h-[90vh] rounded-3xl overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-5 relative border border-[#E6E2D6]">
-        <button id="btn-close-detail-modal" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#FAF8F2] text-[#102F35] flex items-center justify-center font-bold text-sm hover:bg-[#F0ECE1] transition-colors border border-[#E6E2D6]">
+    <div id="product-detail-modal" class="hidden fixed inset-0 z-50 bg-[#34332F]/55 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white max-w-2xl w-full max-h-[90vh] rounded-3xl overflow-y-auto shadow-xl p-6 sm:p-8 space-y-5 relative border border-[#DDD3C3]">
+        <button id="btn-close-detail-modal" type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F8F5EF] text-[#34332F] flex items-center justify-center font-bold text-sm hover:bg-[#E9DFD0] border border-[#DDD3C3] cursor-pointer">
           ✕
         </button>
 
-        <div class="aspect-[16/9] rounded-2xl overflow-hidden bg-[#FAF8F2] border border-[#E6E2D6]">
+        <div class="aspect-[16/9] rounded-2xl overflow-hidden bg-[#E9DFD0] border border-[#DDD3C3]">
           <img id="detail-modal-img" class="w-full h-full object-cover" alt="Product detail" />
         </div>
 
         <div>
-          <span id="detail-modal-category" class="text-xs font-bold text-[#6F9B88] uppercase tracking-wider"></span>
-          <h2 id="detail-modal-title" class="font-serif text-xl sm:text-2xl font-bold text-[#102F35] mt-1"></h2>
-          <div id="detail-modal-price" class="font-serif text-2xl font-extrabold text-[#174C43] mt-2"></div>
+          <span id="detail-modal-category" class="text-xs font-semibold text-[#89977B] uppercase tracking-wider"></span>
+          <h2 id="detail-modal-title" class="font-serif text-xl sm:text-2xl font-bold text-[#34332F] mt-1"></h2>
+          <div id="detail-modal-price" class="font-serif text-2xl font-bold text-[#414A37] mt-2"></div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6]">
-          <div class="text-xs font-bold text-[#102F35] uppercase tracking-wider mb-1 flex items-center gap-1.5">
-            <span>📜</span> <span>Cultural Tradition & Heritage Story</span>
-          </div>
-          <p id="detail-modal-story" class="text-xs sm:text-sm text-[#102F35]/80 italic leading-relaxed"></p>
+        <div class="p-4 rounded-2xl bg-[#F8F5EF] border border-[#DDD3C3]">
+          <div class="text-xs font-bold text-[#414A37] mb-1">Heritage Story</div>
+          <p id="detail-modal-story" class="text-xs sm:text-sm text-[#34332F] italic leading-relaxed"></p>
         </div>
 
         <div>
-          <div class="text-xs font-bold text-[#102F35] uppercase tracking-wider mb-1">Product Description</div>
-          <p id="detail-modal-desc" class="text-xs sm:text-sm text-[#566C70] leading-relaxed whitespace-pre-line"></p>
+          <div class="text-xs font-bold text-[#34332F] mb-1">Product Description</div>
+          <p id="detail-modal-desc" class="text-xs sm:text-sm text-[#66625A] leading-relaxed whitespace-pre-line"></p>
         </div>
 
-        <!-- Master Artisan Mini-Profile Card in Modal -->
-        <div class="p-4 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="p-4 rounded-2xl bg-[#E9DFD0]/65 border border-[#DDD3C3] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-center gap-3">
-            <img 
-              id="detail-modal-artisan-img" 
-              src="./assets/sitadevi_profile.jpg" 
-              alt="Master Artisan" 
-              referrerpolicy="no-referrer" 
-              class="w-12 h-12 rounded-xl object-cover border border-[#174C43] shadow-2xs flex-shrink-0" 
-            />
+            <img id="detail-modal-artisan-img" src="./assets/sitadevi_profile.jpg" alt="Master Artisan" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl object-cover border border-[#89977B] flex-shrink-0" />
             <div>
-              <div class="text-[10px] text-[#566C70] uppercase font-semibold">Master Artisan</div>
-              <div id="detail-modal-artisan-name" class="font-serif font-bold text-[#102F35] text-sm"></div>
-              <div id="detail-modal-artisan-village" class="text-xs text-[#566C70]"></div>
+              <div class="text-[10px] text-[#66625A] uppercase font-semibold">Artisan</div>
+              <div id="detail-modal-artisan-name" class="font-serif font-bold text-[#34332F] text-sm"></div>
+              <div id="detail-modal-artisan-village" class="text-xs text-[#66625A]"></div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <button id="detail-btn-whatsapp" class="px-3.5 py-2 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors">
-              <span>💬</span> WhatsApp
-            </button>
-            <button id="detail-btn-call" class="px-3 py-2 rounded-xl bg-white hover:bg-[#F0ECE1] text-[#102F35] border border-[#E6E2D6] text-xs font-semibold flex items-center gap-1 transition-colors">
-              <span>📞</span> Call
-            </button>
-            <button id="detail-btn-inquiry" class="px-3.5 py-2 rounded-xl bg-[#C95D35] hover:bg-[#B34E28] text-white text-xs font-bold shadow-2xs transition-colors">
-              Send Inquiry
-            </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="detail-btn-whatsapp" type="button" class="px-3.5 py-2 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white text-xs font-semibold cursor-pointer">WhatsApp</button>
+            <button id="detail-btn-call" type="button" class="px-3.5 py-2 rounded-xl bg-white hover:bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3] text-xs font-semibold cursor-pointer">Call</button>
+            <button id="detail-btn-inquiry" type="button" class="px-3.5 py-2 rounded-xl bg-[#B9674B] hover:bg-[#A3553A] text-white text-xs font-semibold cursor-pointer">Send Enquiry</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ===================================================================== -->
-    <!-- MODAL 2: BUYER DIRECT INQUIRY MODAL                                   -->
+    <!-- MODAL 2: EDIT PRODUCT MODAL                                           -->
     <!-- ===================================================================== -->
-    <div id="buyer-inquiry-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white max-w-lg w-full rounded-3xl shadow-2xl p-6 sm:p-8 relative border border-[#E6E2D6]">
-        <button id="btn-close-inquiry-modal" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#FAF8F2] text-[#102F35] flex items-center justify-center font-bold text-sm hover:bg-[#F0ECE1] transition-colors border border-[#E6E2D6]">
+    <div id="product-edit-modal" class="hidden fixed inset-0 z-50 bg-[#34332F]/55 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white max-w-lg w-full max-h-[90vh] rounded-3xl overflow-y-auto shadow-xl p-6 sm:p-8 relative border border-[#DDD3C3]">
+        <button id="btn-close-edit-modal" type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F8F5EF] text-[#34332F] flex items-center justify-center font-bold text-sm hover:bg-[#E9DFD0] border border-[#DDD3C3] cursor-pointer">
           ✕
         </button>
 
-        <h3 class="font-serif text-lg sm:text-xl font-bold text-[#102F35] mb-1" data-i18n="inquiryModalTitle">Send Direct Buyer Inquiry</h3>
-        <p class="text-xs text-[#566C70] mb-4">The artisan will contact you directly via WhatsApp or phone. Zero intermediary commissions.</p>
+        <h3 class="font-serif text-xl font-bold text-[#34332F] mb-1">Edit Product Details</h3>
+        <p class="text-xs text-[#66625A] mb-5">Update your product name, price, status, or story anytime.</p>
 
-        <!-- Product Summary Header -->
-        <div class="p-3.5 rounded-2xl bg-[#FAF8F2] border border-[#E6E2D6] mb-4 flex items-center justify-between text-xs">
-          <span id="inq-product-title-display" class="font-serif font-bold text-[#102F35] truncate max-w-xs"></span>
-          <span id="inq-product-price-display" class="font-serif font-bold text-[#174C43]"></span>
+        <form id="product-edit-form" class="space-y-4 text-sm">
+          <input type="hidden" id="edit-prod-id" />
+          <div>
+            <label for="edit-prod-title" class="block text-xs font-semibold text-[#34332F] mb-1">Product Name</label>
+            <input type="text" id="edit-prod-title" required class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B]" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="edit-prod-category" class="block text-xs font-semibold text-[#34332F] mb-1">Category</label>
+              <select id="edit-prod-category" class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B]"></select>
+            </div>
+            <div>
+              <label for="edit-prod-price" class="block text-xs font-semibold text-[#34332F] mb-1">Selling Price (₹)</label>
+              <input type="number" id="edit-prod-price" min="1" required class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B]" />
+            </div>
+          </div>
+
+          <div>
+            <label for="edit-prod-status" class="block text-xs font-semibold text-[#34332F] mb-1">Status</label>
+            <select id="edit-prod-status" class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B]">
+              <option value="published">Published (Visible to buyers)</option>
+              <option value="pending">Pending Approval (Hidden draft)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="edit-prod-desc" class="block text-xs font-semibold text-[#34332F] mb-1">Description</label>
+            <textarea id="edit-prod-desc" rows="3" class="w-full p-3 rounded-xl border border-[#DDD3C3] bg-[#F8F5EF] focus:bg-white focus:ring-2 focus:ring-[#89977B]"></textarea>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button type="button" id="btn-cancel-edit-modal" class="px-4 py-2.5 rounded-xl bg-[#F8F5EF] text-[#34332F] border border-[#DDD3C3] text-xs font-semibold cursor-pointer">Cancel</button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-[#B9674B] hover:bg-[#A3553A] text-white text-xs sm:text-sm font-semibold cursor-pointer">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: BUYER DIRECT ENQUIRY MODAL                                   -->
+    <!-- ===================================================================== -->
+    <div id="buyer-inquiry-modal" class="hidden fixed inset-0 z-50 bg-[#34332F]/55 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white max-w-lg w-full rounded-3xl shadow-xl p-6 sm:p-8 relative border border-[#DDD3C3]">
+        <button id="btn-close-inquiry-modal" type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F8F5EF] text-[#34332F] flex items-center justify-center font-bold text-sm hover:bg-[#E9DFD0] border border-[#DDD3C3] cursor-pointer">
+          ✕
+        </button>
+
+        <h3 class="font-serif text-lg sm:text-xl font-bold text-[#34332F] mb-1" data-i18n="inquiryModalTitle">Send Direct Buyer Enquiry</h3>
+        <p class="text-xs text-[#66625A] mb-4">The artisan will reply to you directly on WhatsApp or by phone.</p>
+
+        <div class="p-3.5 rounded-2xl bg-[#E9DFD0]/70 border border-[#DDD3C3] mb-4 flex items-center justify-between text-xs">
+          <span id="inq-product-title-display" class="font-serif font-bold text-[#34332F] truncate max-w-xs"></span>
+          <span id="inq-product-price-display" class="font-serif font-bold text-[#414A37]"></span>
         </div>
 
         <form id="buyer-inquiry-form" class="space-y-3.5 text-xs">
           <div>
-            <label class="block font-bold text-[#102F35] mb-1" data-i18n="buyerName">Your Full Name</label>
-            <input type="text" id="inq-buyer-name" required class="w-full p-3 rounded-xl border border-[#E6E2D6] text-xs font-medium bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" placeholder="e.g. Priya Iyer" />
+            <label for="inq-buyer-name" class="block font-semibold text-[#34332F] mb-1" data-i18n="buyerName">Your Name</label>
+            <input type="text" id="inq-buyer-name" required class="w-full p-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF]" placeholder="e.g. Priya Iyer" />
           </div>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-[#102F35] mb-1" data-i18n="buyerPhone">Mobile / WhatsApp</label>
-              <input type="tel" id="inq-buyer-phone" required class="w-full p-3 rounded-xl border border-[#E6E2D6] text-xs font-medium bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" placeholder="+91 98123 45678" />
+              <label for="inq-buyer-phone" class="block font-semibold text-[#34332F] mb-1" data-i18n="buyerPhone">Phone / WhatsApp</label>
+              <input type="tel" id="inq-buyer-phone" required class="w-full p-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF]" placeholder="+91 98123 45678" />
             </div>
             <div>
-              <label class="block font-bold text-[#102F35] mb-1" data-i18n="buyerLocation">City / State</label>
-              <input type="text" id="inq-buyer-location" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-xs font-medium bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" placeholder="Mumbai, MH" />
+              <label for="inq-buyer-location" class="block font-semibold text-[#34332F] mb-1" data-i18n="buyerLocation">City / State</label>
+              <input type="text" id="inq-buyer-location" class="w-full p-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF]" placeholder="Mumbai, MH" />
             </div>
           </div>
           <div>
-            <label class="block font-bold text-[#102F35] mb-1" data-i18n="orderQuantity">Quantity Needed</label>
-            <input type="number" id="inq-quantity" value="1" min="1" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-xs font-medium bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" />
+            <label for="inq-quantity" class="block font-semibold text-[#34332F] mb-1" data-i18n="orderQuantity">Quantity</label>
+            <input type="number" id="inq-quantity" value="1" min="1" class="w-full p-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF]" />
           </div>
           <div>
-            <label class="block font-bold text-[#102F35] mb-1" data-i18n="orderMessage">Message / Custom Requirements</label>
-            <textarea id="inq-message" rows="3" class="w-full p-3 rounded-xl border border-[#E6E2D6] text-xs font-medium bg-[#FAF8F2] focus:ring-2 focus:ring-[#174C43]" placeholder="Specify any custom colors, framing, or bulk requirements..."></textarea>
+            <label for="inq-message" class="block font-semibold text-[#34332F] mb-1" data-i18n="orderMessage">Message</label>
+            <textarea id="inq-message" rows="3" class="w-full p-3 rounded-xl border border-[#DDD3C3] text-sm bg-[#F8F5EF]" placeholder="Ask about colors, framing, or delivery..."></textarea>
           </div>
 
-          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs shadow-sm transition-transform active:scale-95">
-            <span data-i18n="btnSubmitInquiry">Send Direct Inquiry to Artisan</span>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#B9674B] hover:bg-[#A3553A] text-white font-semibold text-sm cursor-pointer">
+            <span data-i18n="btnSubmitInquiry">Send Enquiry to Artisan</span>
           </button>
         </form>
       </div>
     </div>
 
     <!-- ===================================================================== -->
-    <!-- MODAL 3: MARKET-READY PRINTABLE STALL CARD MODAL                      -->
+    <!-- MODAL 4: MARKET-READY PRINTABLE STALL CARD MODAL                      -->
     <!-- ===================================================================== -->
-    <div id="market-card-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white max-w-lg w-full max-h-[95vh] rounded-3xl overflow-y-auto shadow-2xl p-6 sm:p-8 text-center space-y-4 relative border border-[#E6E2D6]">
-        <button id="btn-close-card-modal" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#FAF8F2] text-[#102F35] flex items-center justify-center font-bold text-sm hover:bg-[#F0ECE1] transition-colors border border-[#E6E2D6]">
+    <div id="market-card-modal" class="hidden fixed inset-0 z-50 bg-[#34332F]/65 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white max-w-lg w-full max-h-[95vh] rounded-3xl overflow-y-auto shadow-xl p-6 sm:p-8 text-center space-y-4 relative border border-[#DDD3C3]">
+        <button id="btn-close-card-modal" type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F8F5EF] text-[#34332F] flex items-center justify-center font-bold text-sm hover:bg-[#E9DFD0] border border-[#DDD3C3] cursor-pointer">
           ✕
         </button>
 
         <div>
-          <h3 class="font-serif text-lg font-bold text-[#102F35]" data-i18n="shareCardTitle">Market-Ready Printable Artisan Card</h3>
-          <p class="text-xs text-[#566C70]" data-i18n="shareCardSubtitle">Use this branded card for your stall, WhatsApp catalog, or fair-trade exhibitions.</p>
+          <h3 class="font-serif text-lg font-bold text-[#34332F]" data-i18n="shareCardTitle">Printable Artisan Card</h3>
+          <p class="text-xs text-[#66625A]" data-i18n="shareCardSubtitle">Download and share on WhatsApp or print for craft exhibitions.</p>
         </div>
 
-        <div class="border border-[#E6E2D6] rounded-2xl overflow-hidden shadow-xs bg-[#FAF8F2] max-w-xs mx-auto">
+        <div class="border border-[#DDD3C3] rounded-2xl overflow-hidden bg-[#F8F5EF] max-w-xs mx-auto">
           <img id="market-card-preview-img" class="w-full h-auto object-contain" alt="Printable Stall Card Preview" />
         </div>
 
-        <div class="flex items-center justify-center gap-3 pt-2">
-          <button id="btn-download-stall-card" class="px-5 py-2.5 rounded-xl bg-[#174C43] hover:bg-[#102F35] text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-colors">
-            <span>📥</span> <span data-i18n="btnDownloadCard">Download High-Res PNG Card</span>
+        <div class="pt-2">
+          <button id="btn-download-stall-card" type="button" class="px-6 py-3 rounded-xl bg-[#414A37] hover:bg-[#32392A] text-white font-semibold text-xs sm:text-sm cursor-pointer">
+            <span data-i18n="btnDownloadCard">Download Card Image</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Global Footer -->
-    <footer class="bg-white border-t border-[#E6E2D6] py-10 text-center text-xs text-[#566C70]">
-      <div class="max-w-7xl mx-auto px-4 space-y-3">
-        <div class="flex items-center justify-center gap-2.5">
-          <img 
-            src="./assets/artisan_logo.jpg" 
-            alt="Artisan Logo" 
-            referrerpolicy="no-referrer"
-            class="w-7 h-7 rounded-lg object-contain bg-white shadow-2xs border border-[#E6E2D6] p-0.5"
-          />
-          <span class="font-serif font-bold text-[#102F35] text-base tracking-tight" data-i18n="appTitle">Artisan</span>
-          <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#EAF1ED] text-[#174C43] border border-[#CFDFD7]">Direct Trade</span>
-        </div>
-        <p class="text-[#102F35] font-semibold" data-i18n="appSubtitle">AI-Powered Bridge from Artisan to Market</p>
-        <p class="text-[11px] text-[#566C70]">Pure HTML5, CSS3 & Vanilla JS • Multimodal AI Craft Intelligence • Transparent Fair Living Wages</p>
-      </div>
-    </footer>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-20 lg:bottom-5 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
 
-    <!-- Floating Toast Notifications (Iframe-safe) -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
-
-    <!-- Main Vanilla JavaScript Applet Entrypoint -->
+    <!-- Main Application Entrypoint -->
     <script type="module" src="/src/app.js"></script>
   </body>
 </html>
